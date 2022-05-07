@@ -1,8 +1,8 @@
 # ITK Health Management System by Juan Pablo TA
 
-## Data Modelling
-
 A health management system is used to improve the organization structure and performance for the patients and medical staff daily tasks.
+
+## Data Modelling
 
 In order to create this management system we need to define and model the data that is going to be used.
 
