@@ -68,6 +68,8 @@ interface Doctor extends User{
 
 This model will help us to store the personal information of each member of the administrative staff on the system, they will be able to see Patient and Doctor users, they will also be able to add new Doctor users and see the messages sent via the contact module.
 
+This model will also extend the User model to include the credentials for each Admin user.
+
 ```ts
 interface Admin extends User {
     id_admin: number; // PK AUTO_INCREMENTABLE - DB
@@ -80,6 +82,8 @@ interface Admin extends User {
 ### Appointments
 
 This model will be used to store all the information about the appointments, such as the Patient user requesting it, the Doctor user that will attend the appointment and the type of appointment that will be held.
+
+This model will extend Patient and Doctor models to include the information about the patient and doctor involved in the appointment.
 
 ```ts
 interface Appointment extends Patient, Doctor{
