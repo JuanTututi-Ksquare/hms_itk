@@ -78,7 +78,7 @@ interface Doctor extends User{
 }
 ```
 
-### ENUM - area
+### ENUM - Area
 ```ts
 enum Area {
   Dermatology = "DERMATOLOGY",
