@@ -66,19 +66,19 @@ interface Patient extends User {
 
 ### Doctors
 
-This model will hold the personal information of each Doctor user, and it will allow the Admin users to consult their personal information, including availability and status. Just like the previous interface, this will extend the 'User' model.
+This model will hold the personal information of each Doctor user, and it will allow the Admin users to consult their personal information, including availability and status, also this data will be useful to avoid showing Doctor users who are currently unavalible to the Patient users who are looking to book an appointment. Just like the previous interface, this will extend the 'User' model. 
 
 ```ts
 interface Doctor extends User{
     id_doctor: number; // PK AUTO_INCREMENTABLE - DB
     license_id: string;
-    area: enum Area;
+    area: enum Area; 
     availability: boolean; // (True - Not on vacation / False - On vacation or Day Off)
     status: boolean; // (True - Currently working in hospital / False - No longer working in hospital)
 }
 ```
 
-#### ENUM - Specialty
+### ENUM - area
 ```ts
 enum Area {
   Dermatology = "DERMATOLOGY",
@@ -107,7 +107,7 @@ interface Admin extends User {
 
 ### Appointments
 
-This model will be used to store all the information about the appointments, such as the Patient user requesting it, the Doctor user that will attend the appointment and the type of appointment that will be held.
+This model will be used to store all the information about the appointments, such as the Patient user requesting it, the Doctor user that will attend the appointment. Appointments can be created by Patient users and Doctor users.
 
 ```ts
 interface Appointment{
@@ -115,7 +115,6 @@ interface Appointment{
     id_doctor: number;
     id_patient: number;
     date: Date; // This will be the date of the appointment including date and time
-    type: string; //(The options for this property are yet to be defined)
     status: boolean; // (True - The appointment is still active / False - The appointment was completed or canceled)
 }
 ```
@@ -127,6 +126,7 @@ The contact model will help us to handle all the messages sent via the Contact m
 ```ts
 interface Contact {
   id_contact: number; // PK AUTO_INCREMENTABLE - DB
+  email: string;
   message: string; 
 }
 ```
