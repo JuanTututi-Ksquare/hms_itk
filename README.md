@@ -21,10 +21,12 @@ The Admin role will have permissions to see all Patient and Doctor users, alongs
 
 ```ts
 interface Role {
-  id_role: number; // PK AUTO_INCREMENTABLE - SQL
+  id_role: number; // PK AUTO_INCREMENTABLE - DB
   role: enum Role; // (Patient/Doctor/Admin)
 }
 ```
+
+Since the only available values for role are Patient, Doctor and Admin. They will have predefined values.
 
 ```ts
 enum Role {
@@ -112,8 +114,8 @@ This model will be used to store all the information about the appointments, suc
 ```ts
 interface Appointment{
     id_appointment: number; // PK AUTO_INCREMENTABLE - DB
-    id_doctor: number;
-    id_patient: number;
+    id_doctor: number; //FK References Doctor
+    id_patient: number; // FK references Patient
     date: Date; // This will be the date of the appointment including date and time
     status: boolean; // (True - The appointment is still active / False - The appointment was completed or canceled)
 }
