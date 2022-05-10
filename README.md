@@ -128,7 +128,7 @@ The contact model will help us to handle all the messages sent via the Contact m
 ```ts
 interface Contact {
   id_contact: number; // PK AUTO_INCREMENTABLE - DB
-  email: string;
+  email: string; // The email will be required to sent a message
   message: string; 
 }
 ```
