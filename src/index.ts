@@ -1,8 +1,9 @@
 import express, {Request, Response} from "express";
 import dotenv from "dotenv";
-import { DBConn } from "./models/index.model";
+import { DBConn } from "./models/Index.model";
 import { PatientRouter } from "./routes/Patient.routes";
 import { PopulateRoles, PopulateAreas } from "./config/PopulateModels.config";
+import { AdminRouter } from "./routes/Admin.routes";
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use(express.json());
 
 // Routes
 app.use("/patient", PatientRouter);
+app.use("/admin", AdminRouter);
 
 app.get("/", (req: Request, res: Response) => {
   res.send(req.originalUrl);
