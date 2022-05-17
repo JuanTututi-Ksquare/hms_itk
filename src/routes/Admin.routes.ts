@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import { CreateDoctor } from "../handlers/CreateDoctor.handler";
+import { GetAppointments } from "../handlers/GetAppointments.handler";
 
 export const AdminRouter = Router();
 
@@ -27,7 +28,11 @@ AdminRouter.post(
   }
 );
 
-AdminRouter.post(
+AdminRouter.get("/list-appointments", async (req: Request, res: Response) => {
+  res.send(await GetAppointments());
+})
+
+AdminRouter.get(
   "/list-doctors",
   async (req: Request, res: Response) => {
     res.send("Create appointment middleware");
