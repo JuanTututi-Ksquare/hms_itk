@@ -1,5 +1,7 @@
 import { Sequelize } from "sequelize";
 import { initAppointmentsModel } from "./Appointments.model";
+import { initAreasModel } from "./Areas.model";
+import { initDoctorsModel } from "./Doctors.model";
 import { initPatientsModel } from "./Patients.model";
 import { initRolesModel } from "./Roles.model";
 import { initUsersModel } from "./Users.model";
@@ -8,7 +10,9 @@ export let sequelize: Sequelize;
 
 const models = [
   initAppointmentsModel,
+  initDoctorsModel,
   initPatientsModel,
+  initAreasModel,
   initUsersModel,
   initRolesModel,
 ];
