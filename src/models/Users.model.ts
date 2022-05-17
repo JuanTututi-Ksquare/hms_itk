@@ -6,6 +6,7 @@ import {
   DataTypes,
   Sequelize,
 } from "sequelize";
+import { Doctors } from "./Doctors.model";
 import { Patients } from "./Patients.model";
 
 export class Users extends Model<
@@ -68,6 +69,10 @@ export const initUsersModel = (sequelize: Sequelize) => {
   Users.sync();
 
   Users.hasOne(Patients, {
+    foreignKey: "id_user",
+  });
+
+  Users.hasOne(Doctors, {
     foreignKey: "id_user",
   });
 };

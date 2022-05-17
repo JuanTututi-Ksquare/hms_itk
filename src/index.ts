@@ -1,8 +1,8 @@
 import express, {Request, Response} from "express";
 import dotenv from "dotenv";
-import { DBConn } from "./models/Index.model";
+import { DBConn } from "./models/index.model";
 import { PatientRouter } from "./routes/Patient.routes";
-import { PopulateRoles } from "./config/PopulateModels.config";
+import { PopulateRoles, PopulateAreas } from "./config/PopulateModels.config";
 
 dotenv.config();
 
@@ -31,6 +31,7 @@ app.listen(port, async () => {
     console.log(error);
   }
   try {
+    await PopulateAreas();
     await PopulateRoles();
   } catch (error) {
     console.log(error)
