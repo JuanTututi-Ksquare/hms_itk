@@ -13,11 +13,10 @@ export class Doctors extends Model<
   InferCreationAttributes<Doctors>
 > {
   declare id: CreationOptional<number>;
-  declare id_user: number;
+  declare id_user: string;
   declare id_area: number;
   declare license: string;
   declare availability: CreationOptional<boolean>;
-  declare status: CreationOptional<boolean>;
 }
 
 export const initDoctorsModel = (sequelize: Sequelize) => {
@@ -29,7 +28,7 @@ export const initDoctorsModel = (sequelize: Sequelize) => {
         autoIncrement: true,
       },
       id_user: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
       },
       id_area: {
@@ -41,10 +40,6 @@ export const initDoctorsModel = (sequelize: Sequelize) => {
         allowNull: false,
       },
       availability: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true,
-      },
-      status: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
       },

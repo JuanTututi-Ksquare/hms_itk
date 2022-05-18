@@ -7,14 +7,13 @@ import {
   Sequelize,
 } from "sequelize";
 import { Appointments } from "./Appointments.model";
-import { Users } from "./Users.model";
 
 export class Patients extends Model<
   InferAttributes<Patients>,
   InferCreationAttributes<Patients>
 > {
   declare id: CreationOptional<number>;
-  declare id_user: number;
+  declare id_user: string;
   declare curp: string;
   declare nss: CreationOptional<string>;
 }
@@ -29,7 +28,7 @@ export const initPatientsModel = (sequelize: Sequelize) => {
         allowNull: false,
       },
       id_user: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
       },
       curp: {

@@ -13,13 +13,10 @@ export class Users extends Model<
   InferAttributes<Users>,
   InferCreationAttributes<Users>
 > {
-  declare id_role: number;
-  declare id: CreationOptional<number>;
+  declare id: string;
   declare first_name: string;
   declare last_name: string;
   declare birthdate: Date;
-  declare email: string;
-  declare password: string;
   declare is_deleted: CreationOptional<boolean>;
 }
 
@@ -27,13 +24,8 @@ export const initUsersModel = (sequelize: Sequelize) => {
   Users.init(
     {
       id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         primaryKey: true,
-        autoIncrement: true,
-      },
-      id_role: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
       },
       first_name: {
         type: DataTypes.STRING,
@@ -45,14 +37,6 @@ export const initUsersModel = (sequelize: Sequelize) => {
       },
       birthdate: {
         type: DataTypes.DATEONLY,
-        allowNull: false,
-      },
-      email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      password: {
-        type: DataTypes.STRING,
         allowNull: false,
       },
       is_deleted: {
