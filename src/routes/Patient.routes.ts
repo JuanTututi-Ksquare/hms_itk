@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
+import { CreateAppointment } from "../handlers/CreateAppointment.handler";
 import { CreatePatient } from "../handlers/CreatePatient.handler";
 
 export const PatientRouter = Router();
@@ -28,7 +29,8 @@ PatientRouter.post(
 PatientRouter.post(
   "/create-appointment",
   async (req: Request, res: Response) => {
-    res.send("Create appointment middleware");
+    const {id_doctor, id_patient, date} = req.body;
+    res.send(await CreateAppointment(id_doctor, id_patient, date));
   }
 );
 
