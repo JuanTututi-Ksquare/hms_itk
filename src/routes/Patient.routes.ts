@@ -21,8 +21,16 @@ PatientRouter.post(
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     }
-    const { first_name, last_name, birthdate, email, password, curp } = req.body;
-    res.send(await CreatePatient(first_name, last_name, birthdate, email, password, curp));
+    const { first_name, last_name, birthdate, email, password, curp, role } = req.body;
+    if(role != "patient") {
+      return res.status(400).send({error: "Something went wrong"});
+    }
+    try {
+      const createdPatient = await CreatePatient(first_name, last_name, birthdate, email, password, curp, role);
+      return res.status(201).send({createdPatient});
+    } catch (error) {
+      return res.status(500).send({error: "Something went wrong"});
+    }
   }
 );
 

@@ -3,7 +3,7 @@ import { initAppointmentsModel } from "./Appointments.model";
 import { initAreasModel } from "./Areas.model";
 import { initDoctorsModel } from "./Doctors.model";
 import { initPatientsModel } from "./Patients.model";
-import { initRolesModel } from "./Roles.model";
+// import { initRolesModel } from "./Roles.model";
 import { initUsersModel } from "./Users.model";
 
 export let sequelize: Sequelize;
@@ -14,7 +14,7 @@ const models = [
   initPatientsModel,
   initAreasModel,
   initUsersModel,
-  initRolesModel,
+  // initRolesModel,
 ];
 
 export const DBConn = (

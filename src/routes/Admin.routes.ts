@@ -16,28 +16,43 @@ AdminRouter.post(
   body("email").isEmail(),
   //   Password must be at least 6 chars
   body("password").isLength({ min: 6 }),
-  body("license").isLength({min: 10, max:10}),
-  body("id_area").isInt({min: 1, max:9}),
+  body("license").isLength({ min: 10, max: 10 }),
+  body("id_area").isInt({ min: 1, max: 9 }),
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     }
-    const { first_name, last_name, birthdate, email, password, license, id_area } = req.body;
-    res.send(await CreateDoctor(first_name, last_name, birthdate, email, password, license, id_area));
+    const {
+      first_name,
+      last_name,
+      birthdate,
+      email,
+      password,
+      license,
+      id_area,
+    } = req.body;
+    res.send(
+      await CreateDoctor(
+        first_name,
+        last_name,
+        birthdate,
+        license,
+        id_area,
+        email,
+        password
+      )
+    );
   }
 );
 
 AdminRouter.get("/list-appointments", async (req: Request, res: Response) => {
   res.send(await GetAppointments());
-})
+});
 
-AdminRouter.get(
-  "/list-doctors",
-  async (req: Request, res: Response) => {
-    res.send("Create appointment middleware");
-  }
-);
+AdminRouter.get("/list-doctors", async (req: Request, res: Response) => {
+  res.send("Create appointment middleware");
+});
 
 AdminRouter.get("/list-patients", async (req: Request, res: Response) => {
   res.send("Get appointments middleware");
