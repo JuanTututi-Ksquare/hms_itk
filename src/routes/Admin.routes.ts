@@ -8,16 +8,17 @@ export const AdminRouter = Router();
 AdminRouter.post(
   "/create-doctor",
   //   First and last name must be at least 2 chars long
-  body("first_name").isLength({ min: 2 }),
-  body("last_name").isLength({ min: 2 }),
+  body("first_name").exists().isLength({ min: 2 }),
+  body("last_name").exists().isLength({ min: 2 }),
   //   Birthdate must be before current date
-  body("birthdate").isDate().isBefore(),
+  body("birthdate").exists().isDate().isBefore(),
   //   Email has to be on correct format
-  body("email").isEmail(),
+  body("email").exists().isEmail(),
   //   Password must be at least 6 chars
-  body("password").isLength({ min: 6 }),
-  body("license").isLength({ min: 10, max: 10 }),
-  body("id_area").isInt({ min: 1, max: 9 }),
+  body("password").exists().isLength({ min: 6 }),
+  body("license").exists().isLength({ min: 10, max: 10 }),
+  body("id_area").exists().isInt({ min: 1, max: 9 }),
+  body("role").exists().isString(),
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -31,8 +32,12 @@ AdminRouter.post(
       password,
       license,
       id_area,
+      role,
     } = req.body;
-    res.send(
+    if (role !== "doctor") {
+      return res.status(400).send("Something went wrong :(");
+    }
+    return res.send(
       await CreateDoctor(
         first_name,
         last_name,
@@ -40,7 +45,8 @@ AdminRouter.post(
         license,
         id_area,
         email,
-        password
+        password,
+        role
       )
     );
   }

@@ -1,11 +1,7 @@
+import { Admins } from "../models/Admins.model";
 import { Areas } from "../models/Areas.model";
-// import { Roles } from "../models/Roles.model";
-
-// enum roles {
-//   Patient = "patient",
-//   Doctor = "doctor",
-//   Admin = "admin",
-// }
+import { Patients } from "../models/Patients.model";
+import { Users } from "../models/Users.model";
 
 enum areas {
   Dermatology = "dermatology",
@@ -19,19 +15,6 @@ enum areas {
   Cardiology = "cardiology",
 }
 
-// export const PopulateRoles = () => {
-//   Object.values(roles).forEach(async (element) => {
-//     await Roles.findOrCreate({
-//       where: {
-//         role: element,
-//       },
-//       defaults: {
-//         role: element,
-//       },
-//     });
-//   });
-// };
-
 export const PopulateAreas = () => {
   Object.values(areas).forEach(async (element) => {
     await Areas.findOrCreate({
@@ -44,3 +27,25 @@ export const PopulateAreas = () => {
     });
   });
 };
+
+export const createSU = async () => {
+  const super_user = await Users.findOrCreate({
+    where: {
+      id: "PuZdRtsIAtXAUxNd1Jmc0okbPxs2"
+    },
+    defaults: {
+      id: "PuZdRtsIAtXAUxNd1Jmc0okbPxs2",
+      birthdate: new Date("1984-12-24"),
+      first_name: "Deus",
+      last_name: "Machina",
+    }
+  });
+  Admins.findOrCreate({
+    where: {
+      id_user: "PuZdRtsIAtXAUxNd1Jmc0okbPxs2"
+    }, 
+    defaults: {
+      id_user: "PuZdRtsIAtXAUxNd1Jmc0okbPxs2"
+    } 
+  })
+}

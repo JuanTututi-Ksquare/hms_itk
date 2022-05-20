@@ -8,28 +8,38 @@ export const PatientRouter = Router();
 PatientRouter.post(
   "/create-patient",
   //   First and last name must be at least 2 chars long
-  body("first_name").isLength({ min: 2 }),
-  body("last_name").isLength({ min: 2 }),
+  body("first_name").exists().isLength({ min: 2 }),
+  body("last_name").exists().isLength({ min: 2 }),
   //   Birthdate must be before current date
-  body("birthdate").isDate().isBefore(),
+  body("birthdate").exists().isDate().isBefore(),
   //   Email has to be on correct format
-  body("email").isEmail(),
+  body("email").exists().isEmail(),
   //   Password must be at least 6 chars
-  body("password").isLength({ min: 6 }),
+  body("password").exists().isLength({ min: 6 }),
+  body("curp").exists().isString(),
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     }
-    const { first_name, last_name, birthdate, email, password, curp, role } = req.body;
-    if(role != "patient") {
-      return res.status(400).send({error: "Something went wrong"});
+    const { first_name, last_name, birthdate, email, password, curp, role } =
+      req.body;
+    if (role !== "patient") {
+      return res.status(400).send({ error: "Something went wrong" });
     }
     try {
-      const createdPatient = await CreatePatient(first_name, last_name, birthdate, email, password, curp, role);
-      return res.status(201).send({createdPatient});
+      const createdPatient = await CreatePatient(
+        first_name,
+        last_name,
+        birthdate,
+        email,
+        password,
+        curp,
+        role
+      );
+      return res.status(201).send({ createdPatient });
     } catch (error) {
-      return res.status(500).send({error: "Something went wrong"});
+      return res.status(500).send({ error: "Something went wrong" });
     }
   }
 );
@@ -37,7 +47,7 @@ PatientRouter.post(
 PatientRouter.post(
   "/create-appointment",
   async (req: Request, res: Response) => {
-    const {id_doctor, id_patient, date} = req.body;
+    const { id_doctor, id_patient, date } = req.body;
     res.send(await CreateAppointment(id_doctor, id_patient, date));
   }
 );

@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import { initializeApp } from 'firebase-admin/app';
 import { DBConn } from "./models/Index.model"
 import { PatientRouter } from "./routes/Patient.routes";
-import { PopulateAreas } from "./config/PopulateModels.config";
 import { AdminRouter } from "./routes/Admin.routes";
 
 dotenv.config();
@@ -26,18 +25,13 @@ app.get("/", (req: Request, res: Response) => {
   res.send(req.originalUrl);
 });
 
-app.listen(port, async () => {
-  console.log("app is up at port:", port);
-  try {
-    await DBConn(db_name, db_username, db_password, db_host);
-    console.log("Connection to DB was succesful");
-  } catch (error) {
-    console.log(error);
-  }
-  try {
-    // await PopulateAreas();
-    // await PopulateRoles();
-  } catch (error) {
-    console.log(error)
-  }
+try {
+  DBConn(db_name, db_username, db_password, db_host);
+  console.log("Connection to DB succesful! :)");
+} catch (error) {
+  console.error(error);
+}
+
+app.listen(port, () => {
+  console.log("Server is up at port:", port);
 });

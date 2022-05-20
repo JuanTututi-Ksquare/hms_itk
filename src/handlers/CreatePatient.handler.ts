@@ -13,15 +13,15 @@ export const CreatePatient = async (
   role: Role
 ) => {
   try {
-    const { uid } = await firebaseAdmin.auth().createUser({
+    const firebaseUser = await firebaseAdmin.auth().createUser({
       displayName: `${first_name} ${last_name}`,
       email: email,
       password: password,
     });
-    await firebaseAdmin.auth().setCustomUserClaims(uid, { role });
+    await firebaseAdmin.auth().setCustomUserClaims(firebaseUser.uid, { role });
     
     const userCreated = await Users.create({
-      id: uid,
+      id: firebaseUser.uid,
       first_name: first_name,
       last_name: last_name,
       birthdate: birthdate,
@@ -31,7 +31,7 @@ export const CreatePatient = async (
       id_user: userCreated.id,
       curp: curp,
     });
-    return "Patient registration was succesful!";
+    return firebaseUser.uid;
   } catch (error) {
     return error;
   }
