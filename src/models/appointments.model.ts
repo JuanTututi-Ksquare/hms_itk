@@ -18,8 +18,8 @@ export class Appointments extends Model<
   declare status: CreationOptional<boolean>;
 }
 
-export const initAppointmentsModel = (sequelize: Sequelize) => {
-  Appointments.init(
+export const initAppointmentsModel = async (sequelize: Sequelize) => {
+  await Appointments.init(
     {
       id: {
         type: DataTypes.INTEGER,
@@ -49,5 +49,5 @@ export const initAppointmentsModel = (sequelize: Sequelize) => {
       sequelize: sequelize,
     }
   );
-  Appointments.sync();
+  await Appointments.sync();
 };

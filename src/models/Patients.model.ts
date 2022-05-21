@@ -18,8 +18,8 @@ export class Patients extends Model<
   declare nss: CreationOptional<string>;
 }
 
-export const initPatientsModel = (sequelize: Sequelize) => {
-  Patients.init(
+export const initPatientsModel = async(sequelize: Sequelize) => {
+  await Patients.init(
     {
       id: {
         type: DataTypes.INTEGER,
@@ -45,8 +45,8 @@ export const initPatientsModel = (sequelize: Sequelize) => {
     }
   );
 
-  Patients.sync();
-  Patients.hasMany(Appointments, {
+  await Patients.sync();
+  await Patients.hasMany(Appointments, {
     foreignKey: "id_patient",
   });
 };

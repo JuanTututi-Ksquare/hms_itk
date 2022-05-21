@@ -6,7 +6,6 @@ import {
     CreationOptional,
     Sequelize,
   } from "sequelize";
-  import { Appointments } from "./Appointments.model";
   
   export class Admins extends Model<
     InferAttributes<Admins>,
@@ -16,8 +15,8 @@ import {
     declare id_user: string;
   }
   
-  export const initAdminsModel = (sequelize: Sequelize) => {
-    Admins.init(
+  export const initAdminsModel = async (sequelize: Sequelize) => {
+    await Admins.init(
       {
         id: {
           type: DataTypes.INTEGER,
@@ -34,5 +33,5 @@ import {
         sequelize: sequelize,
       }
     );
-    Admins.sync();
+    await Admins.sync();
   };

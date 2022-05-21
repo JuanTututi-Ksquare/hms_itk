@@ -19,8 +19,8 @@ export class Doctors extends Model<
   declare availability: CreationOptional<boolean>;
 }
 
-export const initDoctorsModel = (sequelize: Sequelize) => {
-  Doctors.init(
+export const initDoctorsModel = async (sequelize: Sequelize) => {
+  await Doctors.init(
     {
       id: {
         type: DataTypes.INTEGER,
@@ -49,8 +49,8 @@ export const initDoctorsModel = (sequelize: Sequelize) => {
       sequelize: sequelize,
     }
   );
-  Doctors.sync();
-  Doctors.hasMany(Appointments, {
+  await Doctors.sync();
+  await Doctors.hasMany(Appointments, {
       foreignKey: "id_doctor"
   })
 };

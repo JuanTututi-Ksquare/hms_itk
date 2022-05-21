@@ -33,7 +33,7 @@ export const DBConn = async (
     await model(sequelize);
   }
 
-  await sequelize.sync();
+  await sequelize.sync({});
 
   try {
     await PopulateAreas();

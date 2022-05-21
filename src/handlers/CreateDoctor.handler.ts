@@ -32,7 +32,8 @@ export const CreateDoctor = async (
       license: license,
       id_area: id_area
     });
-    return firebaseUser.uid;
+    console.log(`New doctor created! ID: ${firebaseUser.uid} / Email: ${firebaseUser.email}`)
+    return ({user: firebaseUser.displayName});
   } catch (error) {
     return error;
   }

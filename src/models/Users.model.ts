@@ -20,8 +20,8 @@ export class Users extends Model<
   declare is_deleted: CreationOptional<boolean>;
 }
 
-export const initUsersModel = (sequelize: Sequelize) => {
-  Users.init(
+export const initUsersModel = async (sequelize: Sequelize) => {
+  await Users.init(
     {
       id: {
         type: DataTypes.STRING,
@@ -50,13 +50,13 @@ export const initUsersModel = (sequelize: Sequelize) => {
     }
   );
 
-  Users.sync();
+  await Users.sync();
 
-  Users.hasOne(Patients, {
+  await Users.hasOne(Patients, {
     foreignKey: "id_user",
   });
 
-  Users.hasOne(Doctors, {
+  await Users.hasOne(Doctors, {
     foreignKey: "id_user",
   });
 };

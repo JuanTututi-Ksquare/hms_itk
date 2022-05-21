@@ -2,8 +2,8 @@ import { Router, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import { CreateDoctor } from "../handlers/CreateDoctor.handler";
 import { GetAppointments } from "../handlers/GetAppointments.handler";
-import { checkAuth } from "../validators/Auth.validator";
-import { roleValidator } from "../validators/Role.validator";
+import { checkAuth } from "../middlewares/Auth.validator";
+import { roleValidator } from "../middlewares/Role.validator";
 
 export const AdminRouter = Router();
 
@@ -56,14 +56,14 @@ AdminRouter.post(
   }
 );
 
-AdminRouter.get("/list-appointments", async (req: Request, res: Response) => {
+AdminRouter.get("/appointments", async (req: Request, res: Response) => {
   res.send(await GetAppointments());
 });
 
-AdminRouter.get("/list-doctors", async (req: Request, res: Response) => {
+AdminRouter.get("/doctors", async (req: Request, res: Response) => {
   res.send("Create appointment middleware");
 });
 
-AdminRouter.get("/list-patients", async (req: Request, res: Response) => {
+AdminRouter.get("/patients", async (req: Request, res: Response) => {
   res.send("Get appointments middleware");
 });
