@@ -2,11 +2,15 @@ import { Router, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import { CreateDoctor } from "../handlers/CreateDoctor.handler";
 import { GetAppointments } from "../handlers/GetAppointments.handler";
+import { checkAuth } from "../validators/Auth.validator";
+import { roleValidator } from "../validators/Role.validator";
 
 export const AdminRouter = Router();
 
 AdminRouter.post(
   "/create-doctor",
+  checkAuth,
+  roleValidator({roles: ["admin"], allowSameUser: true}),
   //   First and last name must be at least 2 chars long
   body("first_name").exists().isLength({ min: 2 }),
   body("last_name").exists().isLength({ min: 2 }),

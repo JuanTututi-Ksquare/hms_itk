@@ -2,11 +2,13 @@ import { Router, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import { CreateAppointment } from "../handlers/CreateAppointment.handler";
 import { CreatePatient } from "../handlers/CreatePatient.handler";
+import { checkAuth } from "../validators/Auth.validator";
+import { roleValidator } from "../validators/Role.validator";
 
 export const PatientRouter = Router();
 
 PatientRouter.post(
-  "/create-patient",
+  "/",
   //   First and last name must be at least 2 chars long
   body("first_name").exists().isLength({ min: 2 }),
   body("last_name").exists().isLength({ min: 2 }),
@@ -46,6 +48,8 @@ PatientRouter.post(
 
 PatientRouter.post(
   "/create-appointment",
+  checkAuth,
+  roleValidator({roles: ["patient"], allowSameUser: true}),
   async (req: Request, res: Response) => {
     const { id_doctor, id_patient, date } = req.body;
     res.send(await CreateAppointment(id_doctor, id_patient, date));
