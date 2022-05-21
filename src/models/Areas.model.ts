@@ -16,8 +16,8 @@ export class Areas extends Model<
   declare area: string;
 }
 
-export const initAreasModel = (sequelize: Sequelize) => {
-  Areas.init(
+export const initAreasModel = async (sequelize: Sequelize) => {
+  await Areas.init(
     {
       id: {
         type: DataTypes.INTEGER,
@@ -34,8 +34,8 @@ export const initAreasModel = (sequelize: Sequelize) => {
       sequelize: sequelize,
     }
   );
-  Areas.sync();
-  Areas.hasMany(Doctors, {
+  await Areas.sync();
+  await Areas.hasMany(Doctors, {
     foreignKey: "id_area",
   });
 };

@@ -10,7 +10,7 @@ export const roleValidator = (options: {roles: Role[], allowSameUser: boolean}) 
         }
 
         if (!options.roles.includes(role)) {
-            return res.status(403).send("Ups!, something went wrong :(");
+            return res.status(403).send({error: "Ups!, something went wrong :("});
         }
 
         return next();
