@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Role } from "../config/CustomTypes";
 
-export const roleValidator = (options: {roles: Role[], allowSameUser: boolean}) => {
+export const roleValidator = (roles: Role[]) => {
     return(req: Request, res: Response, next: Function) => {
         const {uid, email, role} = res.locals;
 
@@ -9,7 +9,7 @@ export const roleValidator = (options: {roles: Role[], allowSameUser: boolean}) 
             return next()
         }
 
-        if (!options.roles.includes(role)) {
+        if (!roles.includes(role)) {
             return res.status(403).send({error: "Ups!, something went wrong :("});
         }
 

@@ -2,8 +2,15 @@ import { Router, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import { CreateAppointment } from "../handlers/CreateAppointment.handler";
 import { CreatePatient } from "../handlers/CreatePatient.handler";
+import { deletePatientAppointment } from "../handlers/DeleteAppointments.handler";
+import { getPatientAppointments, getSinglePatientAppointment } from "../handlers/GetAppointments.handler";
+import { checkAssociation } from "../middlewares/Association.validator";
 import { checkAuth } from "../middlewares/Auth.validator";
-import { checkExistingAppointment, checkExistingDoctor, checkExistingPatient } from "../middlewares/Exists.validator";
+import {
+  checkExistingAppointment,
+  checkExistingDoctor,
+  checkExistingPatient,
+} from "../middlewares/Exists.validator";
 import { roleValidator } from "../middlewares/Role.validator";
 
 export const PatientRouter = Router();
@@ -55,11 +62,11 @@ PatientRouter.post(
 
 // Create Appointment
 PatientRouter.post(
-  "/create-appointment",
+  "/appointment",
   body("id_doctor").exists().isInt(),
   body("date").exists().isISO8601().toDate(),
   checkAuth,
-  roleValidator({roles: ["patient"], allowSameUser: true}),
+  roleValidator(["patient"]),
   // Check if the patient exists
   checkExistingPatient,
   // Check if the doctor exists
@@ -69,17 +76,47 @@ PatientRouter.post(
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() });
-      // return res
-      //   .status(400)
-      //   .send({ error: "Input error: Please verify the payload!" });
+      return res
+        .status(400)
+        .send({ error: "Input error: Please verify the payload!" });
     }
     const { id_doctor, date } = req.body;
-    const id_patient = +req.params.id;
-    res.send(await CreateAppointment(id_doctor, id_patient, date));
+    const { id_patient } = res.locals;
+    res.status(201).send(await CreateAppointment(id_doctor, id_patient, date));
   }
 );
 
-PatientRouter.get("/get-appointments", async (req: Request, res: Response) => {
-  res.send("Get appointments middleware");
-});
+// Get all appointments
+PatientRouter.get(
+  "/appointments",
+  checkAuth,
+  roleValidator(["patient"]),
+  checkExistingPatient,
+  async (req: Request, res: Response) => {
+    const { uid } = res.locals;
+    res.status(200).send(await getPatientAppointments(uid));
+  }
+);
+
+PatientRouter.get(
+  "/appointment/:id",
+  checkAuth,
+  roleValidator(["patient"]),
+  checkAssociation,
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+    res.status(200).send(await getSinglePatientAppointment(+id))
+  }
+)
+
+// Delete an appointment
+PatientRouter.delete(
+  "/appointment/:id",
+  checkAuth,
+  roleValidator(["patient"]),
+  checkAssociation,
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+    res.status(200).send(await deletePatientAppointment(+id));
+  }
+);

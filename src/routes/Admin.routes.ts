@@ -1,16 +1,17 @@
 import { Router, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import { CreateDoctor } from "../handlers/CreateDoctor.handler";
-import { GetAppointments } from "../handlers/GetAppointments.handler";
+import { getAllAppointments } from "../handlers/GetAppointments.handler";
 import { checkAuth } from "../middlewares/Auth.validator";
 import { roleValidator } from "../middlewares/Role.validator";
 
 export const AdminRouter = Router();
 
+// Create a Doctor
 AdminRouter.post(
-  "/create-doctor",
+  "/doctor",
   checkAuth,
-  roleValidator({roles: ["admin"], allowSameUser: true}),
+  roleValidator(["admin"]),
   //   First and last name must be at least 2 chars long
   body("first_name").exists().isLength({ min: 2 }),
   body("last_name").exists().isLength({ min: 2 }),
@@ -57,7 +58,7 @@ AdminRouter.post(
 );
 
 AdminRouter.get("/appointments", async (req: Request, res: Response) => {
-  res.send(await GetAppointments());
+  res.send(await getAllAppointments());
 });
 
 AdminRouter.get("/doctors", async (req: Request, res: Response) => {
