@@ -13,12 +13,13 @@ export const checkExistingPatient = async (
       id_user: res.locals.uid,
     },
   });
-  if (!patient) {
-    return res
-      .status(400)
-      .send(`Patient with id:${res.locals.uid} doesn't exists!`);
-  } else {
+  if (patient) {
+    res.locals = {...res.locals, id_patient: patient.id}
     return next();
+  } else {
+    return res
+        .status(400)
+        .send(`Patient with id:${res.locals.uid} doesn't exists!`); 
   }
 };
 

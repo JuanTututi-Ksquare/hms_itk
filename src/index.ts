@@ -1,7 +1,7 @@
 import express, {Request, Response} from "express";
 import dotenv from "dotenv";
 import { initializeApp } from 'firebase-admin/app';
-import { DBConn } from "./models/index.model"
+import { DBConn } from "./models/Index.model"
 import { PatientRouter } from "./routes/Patient.routes";
 import { AdminRouter } from "./routes/Admin.routes";
 
