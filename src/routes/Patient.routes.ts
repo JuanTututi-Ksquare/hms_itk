@@ -4,7 +4,7 @@ import { CreateAppointment } from "../handlers/CreateAppointment.handler";
 import { CreatePatient } from "../handlers/CreatePatient.handler";
 import { deletePatientAppointment } from "../handlers/DeleteAppointments.handler";
 import { getPatientAppointments, getSinglePatientAppointment } from "../handlers/GetAppointments.handler";
-import { checkAssociation } from "../middlewares/Association.validator";
+import { checkPatientAssociation } from "../middlewares/Association.validator";
 import { checkAuth } from "../middlewares/Auth.validator";
 import {
   checkExistingAppointment,
@@ -28,7 +28,7 @@ PatientRouter.post(
   //   Password must be at least 6 chars
   body("password").exists().isLength({ min: 6 }),
   body("curp").exists().isString().isLength({ min: 18, max: 18 }),
-  // Check if there's no user with same email
+  // Check if user is not deleted
 
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
@@ -64,7 +64,7 @@ PatientRouter.post(
 PatientRouter.post(
   "/appointment",
   body("id_doctor").exists().isInt(),
-  body("date").exists().isISO8601().toDate(),
+  body("date").exists().toDate().isAfter(),
   checkAuth,
   roleValidator(["patient"]),
   // Check if the patient exists
@@ -102,7 +102,7 @@ PatientRouter.get(
   "/appointment/:id",
   checkAuth,
   roleValidator(["patient"]),
-  checkAssociation,
+  checkPatientAssociation,
   async (req: Request, res: Response) => {
     const { id } = req.params;
     res.status(200).send(await getSinglePatientAppointment(+id))
@@ -114,7 +114,7 @@ PatientRouter.delete(
   "/appointment/:id",
   checkAuth,
   roleValidator(["patient"]),
-  checkAssociation,
+  checkPatientAssociation,
   async (req: Request, res: Response) => {
     const { id } = req.params;
     res.status(200).send(await deletePatientAppointment(+id));

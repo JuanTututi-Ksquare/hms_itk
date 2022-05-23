@@ -4,6 +4,7 @@ import { initializeApp } from 'firebase-admin/app';
 import { DBConn } from "./models/Index.model"
 import { PatientRouter } from "./routes/Patient.routes";
 import { AdminRouter } from "./routes/Admin.routes";
+import { DoctorsRouter } from "./routes/Doctor.routes";
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.use(express.json());
 // Routes
 app.use("/patient", PatientRouter);
 app.use("/admin", AdminRouter);
+app.use("/doctor", DoctorsRouter);
 
 app.get("/", (req: Request, res: Response) => {
   res.send(req.originalUrl);
