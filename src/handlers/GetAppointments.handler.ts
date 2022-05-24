@@ -2,6 +2,8 @@ import { Op } from "sequelize";
 import { Appointments } from "../models/Appointments.model";
 import { Patients } from "../models/Patients.model";
 
+// Admin
+// Get all appointments
 export const getAllAppointments = async () => {
   try {
     const appointments = await Appointments.findAll();
@@ -11,6 +13,41 @@ export const getAllAppointments = async () => {
   }
 };
 
+export const getAllAppointmentsByPatient = async (id_patient: number) => {
+  try {
+    const appointments = await Appointments.findAll({
+      where: {
+        id_patient: id_patient,
+      }
+    })
+    if(appointments.length) {
+      return appointments
+    } else {
+      return ({info: "No results were found!"})
+    }
+  } catch (error) {
+    return error;
+  }
+}
+
+export const getAllAppointmentsByDoctor = async (id_doctor: number) => {
+  try {
+    const appointments = await Appointments.findAll({
+      where: {
+        id_doctor: id_doctor,
+      }
+    })
+    if(appointments.length) {
+      return appointments
+    } else {
+      return ({info: "No results were found!"})
+    }
+  } catch (error) {
+    return error;
+  }
+}
+
+// Patient
 export const getPatientAppointments = async (uid: number) => {
   try {
     const patient = await Patients.findOne({
@@ -19,7 +56,7 @@ export const getPatientAppointments = async (uid: number) => {
       },
     });
     if(!patient) {
-      return {error: "Ups... something went wrong! :("}
+      throw new Error(`User with id: ${uid} doesn't exists!`)
     }
     const list = await Appointments.findAll({
       where: {
@@ -27,8 +64,8 @@ export const getPatientAppointments = async (uid: number) => {
         status: true,
       },
     });
-    if (!list) {
-      return {info: "This patient doesn't have any appointments yet"}
+    if (!list.length) {
+      return ({info: "No results were found!"})
     } else {
       return list;
     }
@@ -48,14 +85,14 @@ export const getSinglePatientAppointment = async (id_appointment: number) => {
     if (appointment) {
       return appointment; 
     } else {
-       return ({error: "No results were found!"})
+       return ({info: "No results were found!"})
     }
-    
   } catch (error) {
     return error;
   }
 }
 
+// Doctor
 export const getDoctorAppointments = async (id_doctor: number) => {
   try {
     const appointments = await Appointments.findAll({
@@ -67,7 +104,7 @@ export const getDoctorAppointments = async (id_doctor: number) => {
     if (appointments.length) {
       return appointments;
     } else {
-      return ({error: "This doctor doesn't have any appointments yet"})
+      return ({info: "No results were found!"})
     }
   } catch (error) {
     return error
@@ -88,12 +125,13 @@ export const getDoctorAppointmentsByDate = async (id_doctor: number, date: strin
     if (appointments.length) {
       return appointments;
     } else {
-      return ({error: "This doctor doesn't have any appointments yet"})
+      return ({info: "No results were found!"})
     }
   } catch (error) {
     return error
   }
 }
+
 
 export const getDoctorAppointmentsByPatient = async (id_doctor: number, id_patient: number) => {
   try {
@@ -107,7 +145,7 @@ export const getDoctorAppointmentsByPatient = async (id_doctor: number, id_patie
     if (appointments.length) {
       return appointments;
     } else {
-      return ({error: "No results were found!"})
+      return ({info: "This doctor doesn't have any appointments yet"})
     }
   } catch (error) {
     return ({error: error});

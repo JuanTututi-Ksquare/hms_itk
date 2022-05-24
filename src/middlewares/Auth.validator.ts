@@ -31,7 +31,7 @@ export const checkAuth = async (
     });
   }
 
-  const token = splittedToken[1];
+  const [_, token] = authorization.split("Bearer ")
 
   //   Token decoding
   try {

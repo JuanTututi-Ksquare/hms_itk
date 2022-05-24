@@ -7,7 +7,7 @@ export const CreateAppointment = async (id_doctor:number, id_patient:number , da
             id_patient: id_patient,
             date: date,
         });
-        return ({createdAppointment: createdAppointment});
+        return ({success: createdAppointment});
     } catch (error) {
         return error;
     }

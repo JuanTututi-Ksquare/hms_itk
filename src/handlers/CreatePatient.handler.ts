@@ -32,7 +32,7 @@ export const CreatePatient = async (
       curp: curp,
     });
     console.log(`New patient created! ID: ${firebaseUser.uid} / Email: ${firebaseUser.email}`)
-    return ({user: firebaseUser.displayName});
+    return ({success: "Patient created succesfully!"});
   } catch (error) {
     return error;
   }
