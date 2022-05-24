@@ -1,25 +1,31 @@
 import { Request, Response } from "express";
+import { TenantAwareAuth } from "firebase-admin/lib/auth/tenant-manager";
 import { Appointments } from "../models/Appointments.model";
 import { Doctors } from "../models/Doctors.model";
 import { Patients } from "../models/Patients.model";
+import { Users } from "../models/Users.model";
 
 export const checkExistingPatient = async (
   req: Request,
   res: Response,
   next: Function
 ) => {
-  const patient = await Patients.findOne({
-    where: {
-      id_user: res.locals.uid,
-    },
-  });
-  if (patient) {
-    res.locals = {...res.locals, id_patient: patient.id}
-    return next();
-  } else {
-    return res
+  try {
+    const patient = await Patients.findOne({
+      where: {
+        id_user: res.locals.uid,
+      },
+    });
+    if (patient) {
+      res.locals = { ...res.locals, id_patient: patient.id };
+      return next();
+    } else {
+      return res
         .status(400)
-        .send(`Patient with id:${res.locals.uid} doesn't exists!`); 
+        .send({error: `Patient with id:${res.locals.uid} doesn't exists!`});
+    }
+  } catch (error) {
+    return res.status(500).send({error: "Internal server error, please try again later! :("});
   }
 };
 
@@ -29,47 +35,96 @@ export const checkExistingDoctor = async (
   next: Function
 ) => {
   let doctor: Doctors | null;
-  if (req.body.id_doctor) {
-    doctor = await Doctors.findOne({
-      where: {
-        id: req.body.id_doctor,
-      },
-    });
-    console.log(req.body.id_doctor)
-  } else {
-    doctor = await Doctors.findOne({
-      where: {
-        id_user: res.locals.uid,
-      }
-    })
-  }
-  
-  if (!doctor) {
-    return res
-      .status(400)
-      .send(`Doctor with id:${req.body.id_doctor} doesn't exists!`);
-  } else {
-      res.locals = {...res.locals, id_doctor: doctor.id}
+  try {
+    if (req.body.id_doctor) {
+      doctor = await Doctors.findOne({
+        where: {
+          id: req.body.id_doctor,
+        },
+      });
+    } else {
+      doctor = await Doctors.findOne({
+        where: {
+          id_user: res.locals.uid,
+        },
+      });
+    }
+
+    if (!doctor) {
+      return res
+        .status(400)
+        .send({error: `Doctor with id:${req.body.id_doctor} doesn't exists!`});
+    } else {
+      res.locals = { ...res.locals, id_doctor: doctor.id };
       return next();
+    }
+  } catch (error) {
+    return res.status(500).send({error: "Internal server error, please try again later! :("});
   }
 };
 
 export const checkExistingAppointment = async (
-    req: Request,
-    res: Response,
-    next: Function
-  ) => {
+  req: Request,
+  res: Response,
+  next: Function
+) => {
+  try {
     const appointment = await Appointments.findOne({
       where: {
         date: req.body.date,
-        status: true
+        status: true,
       },
     });
     if (appointment) {
       return res
         .status(400)
-        .send(`Appointment with date:${req.body.date} already exists!`);
+        .send({error: `Appointment with date:${req.body.date} already exists!`});
     } else {
-        return next();
+      return next();
     }
-  };
+  } catch (error) {
+    return res.status(500).send({error: "Internal server error, please try again later! :("});
+  }
+};
+
+export const checkInactiveUser = async (
+  req: Request,
+  res: Response,
+  next: Function
+) => {
+  try {
+    const { id_user } = req.body;
+    const inactiveUser = await Users.findOne({
+      where: {
+        id: id_user,
+        is_deleted: true,
+      },
+    });
+    if (inactiveUser) {
+      return next();
+    } else {
+      return res.status(404).send({error: `User with id: ${id_user} doesn't exists!`});
+    }
+  } catch (error) {
+    return res.status(500).send({error: "Internal server error, please try again later! :("});
+  }
+};
+
+export const checkExistingUser = async (req: Request, res: Response, next: Function) => {
+  try {
+    const {uid} = res.locals;
+    const activeUser = await Users.findOne({
+      where: {
+        id: uid,
+        is_deleted: false
+      }
+    })
+    if(activeUser) {
+      return next();
+    } else {
+      res.status(404).send({error: `User with id: ${uid} doesn't exists!`})
+    }
+  } catch (error) {
+    return res.status(500).send({error: "Internal server error, please try again later! :("});
+  }
+}

@@ -1,6 +1,6 @@
 import { Appointments } from "../models/Appointments.model";
 
-export const UpdateAppointment = async (date: Date, id: number) => {
+export const UpdateAppointmentDate = async (date: Date, id: number) => {
   try {
     const updatedAppointment = await Appointments.update(
       {
@@ -12,7 +12,7 @@ export const UpdateAppointment = async (date: Date, id: number) => {
         },
       }
     );
-    return { updatedAppointment: updatedAppointment };
+    return { success: "Appointment updated sucessfully!" };
   } catch (error) {
     return error;
   }

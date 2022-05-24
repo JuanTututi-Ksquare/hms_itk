@@ -25,7 +25,7 @@ export const checkPatientAssociation = async (req: Request, res: Response, next:
         }
         return next();
     } catch (error) {
-        return error;
+        return res.status(500).send({error: "Internal server error, please try again later! :("});
     }
 }
 
@@ -51,6 +51,6 @@ export const checkDoctorAssociation = async (req: Request, res: Response, next: 
         }
         return next();
     } catch (error) {
-        return error;
+        return res.status(500).send({error: "Internal server error, please try again later! :("});
     }
 }

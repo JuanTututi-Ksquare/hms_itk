@@ -4,7 +4,7 @@
   "description": "Health Management System",
   "main": "index.js",
   "scripts": {
-    "test": "concurrently \"tsc --watch\" \"nodemon dist/index.js\""
+    "start": "concurrently \"tsc --watch\" \"nodemon dist/App.js\""
   },
   "repository": {
     "type": "git",
