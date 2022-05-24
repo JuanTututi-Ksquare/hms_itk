@@ -22,7 +22,7 @@ export const checkExistingPatient = async (
     } else {
       return res
         .status(400)
-        .send({error: `Patient with id:${res.locals.uid} doesn't exists!`});
+        .send({error: `Patient doesn't exists!`});
     }
   } catch (error) {
     return res.status(500).send({error: "Internal server error, please try again later! :("});
@@ -53,7 +53,7 @@ export const checkExistingDoctor = async (
     if (!doctor) {
       return res
         .status(400)
-        .send({error: `Doctor with id:${req.body.id_doctor} doesn't exists!`});
+        .send({error: `Doctor doesn't exists!`});
     } else {
       res.locals = { ...res.locals, id_doctor: doctor.id };
       return next();
@@ -78,7 +78,7 @@ export const checkExistingAppointment = async (
     if (appointment) {
       return res
         .status(400)
-        .send({error: `Appointment with date:${req.body.date} already exists!`});
+        .send({error: `Appointment already exists!`});
     } else {
       return next();
     }
@@ -103,7 +103,7 @@ export const checkInactiveUser = async (
     if (inactiveUser) {
       return next();
     } else {
-      return res.status(404).send({error: `User with id: ${id_user} doesn't exists!`});
+      return res.status(404).send({error: `User doesn't exists!`});
     }
   } catch (error) {
     return res.status(500).send({error: "Internal server error, please try again later! :("});
@@ -122,7 +122,7 @@ export const checkExistingUser = async (req: Request, res: Response, next: Funct
     if(activeUser) {
       return next();
     } else {
-      res.status(404).send({error: `User with id: ${uid} doesn't exists!`})
+      res.status(404).send({error: `User doesn't exists!`})
     }
   } catch (error) {
     return res.status(500).send({error: "Internal server error, please try again later! :("});
