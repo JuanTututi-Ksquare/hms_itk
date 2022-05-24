@@ -6,6 +6,7 @@ import {
   getAllAppointments,
   getAllAppointmentsByDoctor,
   getAllAppointmentsByPatient,
+  getAllAppointmentsByStatus,
 } from "../handlers/GetAppointments.handler";
 import { checkAuth } from "../middlewares/Auth.validator";
 import { checkInactiveUser } from "../middlewares/Exists.validator";
@@ -81,8 +82,10 @@ AdminRouter.patch(
       const user = await ActivateUser(id_user);
       res.status(200).send(user);
     } catch (error) {
-      res.status(500).send({error: "Internal server error, please try again later!"})
-    } 
+      res
+        .status(500)
+        .send({ error: "Internal server error, please try again later!" });
+    }
   }
 );
 
@@ -93,20 +96,36 @@ AdminRouter.get(
   roleValidator(["admin"]),
   async (req: Request, res: Response) => {
     try {
+      // Filter by patient
       if (typeof req.query.patient === "string") {
         const id_patient = <string>req.query.patient;
         const appointments = await getAllAppointmentsByPatient(+id_patient);
         res.status(200).send(appointments);
-      } else if (typeof req.query.doctor === "string") {
+      } 
+      // Filter by doctor
+      else if (typeof req.query.doctor === "string") {
         const id_doctor = req.query.doctor;
         const appointments = await getAllAppointmentsByDoctor(+id_doctor);
         res.status(200).send(appointments);
-      } else {
-        const appointments = await getAllAppointments()
+      } 
+      // Filter by status
+      else if (typeof req.query.status === "string") {
+        const status = req.query.status;
+        const appointments = await getAllAppointmentsByStatus(status);
         res.status(200).send(appointments);
       }
+      // No filter
+      else if (!Object.keys(req.query).length) {
+        console.log(req.query);
+        const appointments = await getAllAppointments();
+        res.status(200).send(appointments);
+      } else {
+        res.status(400).send({error: "Invalid request!"});        
+      }
     } catch (error) {
-      res.status(500).send({error: "Internal server error, please try again later!"})
+      res
+        .status(500)
+        .send({ error: "Internal server error, please try again later!" });
     }
   }
 );

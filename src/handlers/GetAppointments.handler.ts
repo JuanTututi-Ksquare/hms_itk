@@ -47,6 +47,31 @@ export const getAllAppointmentsByDoctor = async (id_doctor: number) => {
   }
 }
 
+export const getAllAppointmentsByStatus = async (value: string) => {
+  let status: boolean;
+  try {
+    if (value === "true") {
+      status = true;
+    } else if (value === "false") {
+      status = false;
+    } else {
+      return new Error("Invalid value for query string"); 
+    }
+    const appointments = await Appointments.findAll({
+      where: {
+        status: status
+      }
+    })
+    if(appointments.length) {
+      return appointments;
+    } else {
+      return ({info: "No results were found!"})
+    }
+  } catch (error) {
+    return error;
+  }
+}
+
 // Patient
 export const getPatientAppointments = async (uid: number) => {
   try {
