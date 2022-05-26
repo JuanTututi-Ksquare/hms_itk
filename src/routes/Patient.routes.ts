@@ -53,7 +53,7 @@ PatientRouter.post(
         curp,
         role
       );
-      return res.status(201).send(createdPatient);
+      return res.status(201).send({success: "Patient user created successfully!"});
     } catch (error) {
       return res.status(500).send({ error: "Something went wrong" });
     }
@@ -149,7 +149,7 @@ PatientRouter.delete(
     const { id } = req.params;
     try {
       const appointment = await deletePatientAppointment(+id);
-      res.status(200).send(appointment);
+      res.status(200).send({sucess: "Appointment deleted successfully!"});
     } catch (error) {
       res.status(500).send({error: "Internal server error, please try again later!"})
     }

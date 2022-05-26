@@ -27,6 +27,7 @@ export const DBConn = async (
   const sequelize = new Sequelize(db_name, db_username, db_password, {
     host: db_host,
     dialect: "postgres",
+    timezone: "-05:00"
   });
 
   for (const model of models) {
@@ -37,10 +38,6 @@ export const DBConn = async (
 
   try {
     await PopulateAreas();
-
-  // SU Credentials
-  // "deus-ex-machina@admin.com",
-  // "Fire1984@",
     await createSU();
   } catch (error) {
     console.log(error);

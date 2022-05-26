@@ -1,76 +1,50 @@
-import { Op } from "sequelize";
+import { Op, OrderItem } from "sequelize";
+import {
+  AdminFilters as Filters,
+  DoctorFilters,
+  Pagination,
+} from "../config/CustomTypes";
 import { Appointments } from "../models/Appointments.model";
 import { Patients } from "../models/Patients.model";
 
 // Admin
 // Get all appointments
-export const getAllAppointments = async () => {
-  try {
-    const appointments = await Appointments.findAll();
-    return appointments;
-  } catch (error) {
-    return error;
+export const getAllAppointments = async (
+  pagination: Pagination,
+  filters?: Filters
+) => {
+  const pageNumber = pagination["page"] <= 0 ? 1 : pagination["page"];
+  const limit = pagination["limit"];
+  const offset = (pageNumber - 1) * limit;
+  if (filters) {
+    try {
+      const appointments = await Appointments.findAll({
+        where: {
+          ...filters,
+        },
+        offset: offset,
+        limit: limit,
+      });
+      if (appointments.length) {
+        return appointments;
+      } else {
+        return { info: "No results were found!" };
+      }
+    } catch (error) {
+      return error;
+    }
+  } else {
+    try {
+      const appointments = await Appointments.findAll({
+        offset: offset,
+        limit: limit,
+      });
+      return appointments;
+    } catch (error) {
+      return error;
+    }
   }
 };
-
-export const getAllAppointmentsByPatient = async (id_patient: number) => {
-  try {
-    const appointments = await Appointments.findAll({
-      where: {
-        id_patient: id_patient,
-      }
-    })
-    if(appointments.length) {
-      return appointments
-    } else {
-      return ({info: "No results were found!"})
-    }
-  } catch (error) {
-    return error;
-  }
-}
-
-export const getAllAppointmentsByDoctor = async (id_doctor: number) => {
-  try {
-    const appointments = await Appointments.findAll({
-      where: {
-        id_doctor: id_doctor,
-      }
-    })
-    if(appointments.length) {
-      return appointments
-    } else {
-      return ({info: "No results were found!"})
-    }
-  } catch (error) {
-    return error;
-  }
-}
-
-export const getAllAppointmentsByStatus = async (value: string) => {
-  let status: boolean;
-  try {
-    if (value === "true") {
-      status = true;
-    } else if (value === "false") {
-      status = false;
-    } else {
-      return new Error("Invalid value for query string"); 
-    }
-    const appointments = await Appointments.findAll({
-      where: {
-        status: status
-      }
-    })
-    if(appointments.length) {
-      return appointments;
-    } else {
-      return ({info: "No results were found!"})
-    }
-  } catch (error) {
-    return error;
-  }
-}
 
 // Patient
 export const getPatientAppointments = async (uid: number) => {
@@ -80,8 +54,8 @@ export const getPatientAppointments = async (uid: number) => {
         id_user: uid,
       },
     });
-    if(!patient) {
-      throw new Error(`User with id: ${uid} doesn't exists!`)
+    if (!patient) {
+      throw new Error(`User with id: ${uid} doesn't exists!`);
     }
     const list = await Appointments.findAll({
       where: {
@@ -90,7 +64,7 @@ export const getPatientAppointments = async (uid: number) => {
       },
     });
     if (!list.length) {
-      return ({info: "No results were found!"})
+      return { info: "No results were found!" };
     } else {
       return list;
     }
@@ -104,75 +78,139 @@ export const getSinglePatientAppointment = async (id_appointment: number) => {
     const appointment = await Appointments.findOne({
       where: {
         id: id_appointment,
-        status: true
-      }
-    })
+        status: true,
+      },
+    });
     if (appointment) {
-      return appointment; 
+      return appointment;
     } else {
-       return ({info: "No results were found!"})
+      return { info: "No results were found!" };
     }
   } catch (error) {
     return error;
   }
-}
+};
 
 // Doctor
-export const getDoctorAppointments = async (id_doctor: number) => {
-  try {
-    const appointments = await Appointments.findAll({
-      where: {
-        id_doctor: id_doctor,
-        status: true,
-      }
-    });
-    if (appointments.length) {
-      return appointments;
-    } else {
-      return ({info: "No results were found!"})
-    }
-  } catch (error) {
-    return error
-  }
-}
+export const getDoctorAppointments = async (
+  id_doctor: number,
+  pagination: Pagination,
+  filters?: DoctorFilters
+) => {
+  const pageNumber = pagination["page"] <= 0 ? 1 : pagination["page"];
+  const limit = pagination["limit"];
+  const offset = (pageNumber - 1) * limit;
 
-export const getDoctorAppointmentsByDate = async (id_doctor: number, date: string) => {
-  try {
+  if (
+    filters &&
+    Object.keys(filters).includes("date") &&
+    !Object.keys(filters).includes("orderByPatient") &&
+    !Object.keys(filters).includes("orderByDate")
+  ) {
+    const { date, dateOrder, ...otherFilters } = filters;
     const initialDate = date + "T00:00:00";
     const endDate = date + "T24:00:00";
-    const appointments = await Appointments.findAll({
-      where: {
-        id_doctor: id_doctor,
-        date: {[Op.between]: [initialDate, endDate]},
-        status: true,
-      }
-    });
-    if (appointments.length) {
-      return appointments;
-    } else {
-      return ({info: "No results were found!"})
+    let order = [];
+
+    let finalDateOrder = "ASC";
+    if (dateOrder) {
+      finalDateOrder = <string>filters["dateOrder"];
     }
-  } catch (error) {
-    return error
+    order.push(["date", finalDateOrder] as OrderItem);
+
+    try {
+      const appointments = await Appointments.findAll({
+        where: {
+          ...otherFilters,
+          id_doctor: id_doctor,
+          date: { [Op.between]: [initialDate, endDate] },
+          status: true,
+        },
+        offset: offset,
+        limit: limit,
+        order: [...order],
+      });
+      if (appointments.length) {
+        return appointments;
+      } else {
+        return { info: "No results were found!" };
+      }
+    } catch (error) {
+      return error;
+    }
   }
-}
 
+  if (
+    filters &&
+    Object.keys(filters).includes("id_patient") &&
+    !Object.keys(filters).includes("orderByPatient") &&
+    !Object.keys(filters).includes("orderByDate") &&
+    !Object.keys(filters).includes("date")
+  ) {
+    try {
+      const appointments = await Appointments.findAll({
+        where: {
+          ...filters,
+          id_doctor: id_doctor,
+          status: true,
+        },
+        offset: offset,
+        limit: limit,
+      });
+      if (appointments.length) {
+        return appointments;
+      } else {
+        return { info: "No results were found!" };
+      }
+    } catch (error) {
+      return error;
+    }
+  }
 
-export const getDoctorAppointmentsByPatient = async (id_doctor: number, id_patient: number) => {
+  if (
+    filters &&
+    (Object.keys(filters).includes("orderByPatient") ||
+      Object.keys(filters).includes("orderByDate"))
+  ) {
+    const order = Object.keys(filters).includes("orderByPatient")
+      ? (["id_patient", filters["orderByPatient"]] as OrderItem)
+      : (["date", filters["orderByDate"]] as OrderItem);
+      console.log(order);
+    try {
+      const appointments = await Appointments.findAll({
+        where: {
+          id_doctor: id_doctor,
+          status: true,
+        },
+        offset: offset,
+        limit: limit,
+        order: [order],
+      });
+      if (appointments.length) {
+        return appointments;
+      } else {
+        return { info: "No results were found!" };
+      }
+    } catch (error) {
+      return error;
+    }
+  }
+
   try {
     const appointments = await Appointments.findAll({
       where: {
         id_doctor: id_doctor,
-        id_patient: id_patient,
-        status: true
-      }
+        status: true,
+      },
+      offset: offset,
+      limit: limit,
     });
     if (appointments.length) {
       return appointments;
     } else {
-      return ({info: "This doctor doesn't have any appointments yet"})
+      return { info: "No results were found!" };
     }
   } catch (error) {
-    return ({error: error});
+    return error;
   }
-}
+};
