@@ -3,6 +3,7 @@ import { PopulateAreas, createSU } from "../config/PopulateModels.config";
 import { initAdminsModel } from "./Admins.model";
 import { initAppointmentsModel } from "./Appointments.model";
 import { initAreasModel } from "./Areas.model";
+import { initContactModel } from "./Contact.model";
 import { initDoctorsModel } from "./Doctors.model";
 import { initPatientsModel } from "./Patients.model";
 import { initUsersModel } from "./Users.model";
@@ -10,6 +11,7 @@ import { initUsersModel } from "./Users.model";
 export let sequelize: Sequelize;
 
 const models = [
+  initContactModel,
   initAdminsModel,
   initAppointmentsModel,
   initDoctorsModel,

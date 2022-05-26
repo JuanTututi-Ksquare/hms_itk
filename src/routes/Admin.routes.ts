@@ -129,58 +129,82 @@ AdminRouter.get(
   async (req: Request, res: Response) => {
     let filters: AdminFilters = {};
     let pagination: { page: number; limit: number } = { page: 1, limit: 10 };
+    // Filter by patient
+    if (req.query.patient && typeof req.query.patient === "string") {
+      const id_patient = +req.query.patient;
+      if (!Number.isNaN(id_patient)) {
+        filters = { ...filters, id_patient: +id_patient };
+      } else {
+        res.status(400).send({error: "Invalid request!"});
+      }
+    }
+
+    // Filter by doctor
+    if (req.query.doctor && typeof req.query.doctor === "string") {
+      const id_doctor = +req.query.doctor;
+      if (!Number.isNaN(id_doctor)) {
+        filters = { ...filters, id_doctor: +id_doctor };
+      } else {
+        res.status(400).send({error: "Invalid request!"});
+      }
+    }
+
+    // Filter by status
+    if (req.query.status && typeof req.query.status === "string") {
+      let status = true;
+      if (req.query.status === "true") {
+        status = true;
+        filters = { ...filters, status };
+      } else if (req.query.status === "false") {
+        status = false;
+        filters = { ...filters, status };
+      } else {
+        res.status(400).send({error: "Invalid request!"});
+      }
+    }
+
+    if(req.query.order && typeof req.query.order === "string") {
+      const splittedOrder = req.query.order.split("+");
+      const index = splittedOrder[0];
+      const order = splittedOrder[1];
+      // Order by Patient ID
+      if (index === "patient" && order === "ASC") {
+        filters["orderByPatient"] = "ASC";
+      } else if (index === "patient" && order === "DESC") {
+        filters["orderByPatient"] = "DESC";
+      } else if(index === "patient") {
+        filters["orderByPatient"] = "ASC"
+      }
+
+      // Order by Doctor ID
+      if (index === "doctor" && order === "ASC") {
+        filters["orderByDoctor"] = "ASC";
+      } else if (index === "doctor" && order === "DESC") {
+        filters["orderByDoctor"] = "DESC";
+      } else if(index === "doctor") {
+        filters["orderByDoctor"] = "ASC"
+      }
+
+    }
+
+    if (typeof req.query.page === "string") {
+      const page = +req.query.page;
+      if (typeof page === "number") {
+        pagination["page"] = +req.query.page;
+      } else {
+        res.status(400).send({error: "Invalid request!"});
+      }
+    }
+
+    if (typeof req.query.limit === "string") {
+      const limit = +req.query.limit;
+      if (typeof limit === "number") {
+        pagination["limit"] = +req.query.limit;
+      } else {
+        res.status(400).send({error: "Invalid request!"});
+      }
+    }
     try {
-      // Filter by patient
-      if (typeof req.query.patient === "string") {
-        const id_patient = +req.query.patient;
-        if (!Number.isNaN(id_patient)) {
-          filters = { ...filters, id_patient: +id_patient };
-        } else {
-          res.status(400).send({error: "Invalid request!"});
-        }
-      }
-
-      // Filter by doctor
-      if (typeof req.query.doctor === "string") {
-        const id_doctor = +req.query.doctor;
-        if (!Number.isNaN(id_doctor)) {
-          filters = { ...filters, id_doctor: +id_doctor };
-        } else {
-          res.status(400).send({error: "Invalid request!"});
-        }
-      }
-
-      // Filter by status
-      if (typeof req.query.status === "string") {
-        let status = true;
-        if (req.query.status === "true") {
-          status = true;
-          filters = { ...filters, status };
-        } else if (req.query.status === "false") {
-          status = false;
-          filters = { ...filters, status };
-        } else {
-          res.status(400).send({error: "Invalid request!"});
-        }
-      }
-
-      if (typeof req.query.page === "string") {
-        const page = +req.query.page;
-        if (typeof page === "number") {
-          pagination["page"] = +req.query.page;
-        } else {
-          res.status(400).send({error: "Invalid request!"});
-        }
-      }
-
-      if (typeof req.query.limit === "string") {
-        const limit = +req.query.limit;
-        if (typeof limit === "number") {
-          pagination["limit"] = +req.query.limit;
-        } else {
-          res.status(400).send({error: "Invalid request!"});
-        }
-      }
       if (Object.keys(filters).length) {
         const appointments = await getAllAppointments(pagination, filters);
         res.status(200).send(appointments);
@@ -188,6 +212,7 @@ AdminRouter.get(
         if (!Object.keys(req.query).length ||
         Object.keys(req.query).includes("page") ||
         Object.keys(req.query).includes("limit") ) {
+          console.log("sin filters 1");
           const appointments = await getAllAppointments(pagination);
           res.status(200).send(appointments);
         } else {
