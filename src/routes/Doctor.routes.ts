@@ -47,17 +47,17 @@ DoctorsRouter.get(
       const index = splittedOrder[0];
       const order = splittedOrder[1];
       if (index === "patient" && order === "ASC") {
-        filters["orderByPatient"] = "ASC";
+        filters["orderByPatient"] = order;
       } else if (index === "patient" && order === "DESC") {
-        filters["orderByPatient"] = "DESC"
+        filters["orderByPatient"] = order
       } else if (index ==="patient") {
         filters["orderByPatient"] = "ASC";
       }
 
       if (index === "date" && order === "ASC") {
-        filters["orderByDate"] = "ASC"
+        filters["orderByDate"] = order
       } else if(index === "date" && order === "DESC") {
-        filters["orderByDate"] = "DESC"
+        filters["orderByDate"] = order
       } else if (index === "date") {
         filters["orderByDate"] = "ASC"
       }

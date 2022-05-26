@@ -1,6 +1,6 @@
 import { Op, OrderItem } from "sequelize";
 import {
-  AdminFilters as Filters,
+  AdminFilters,
   DoctorFilters,
   Pagination,
 } from "../config/CustomTypes";
@@ -11,12 +11,14 @@ import { Patients } from "../models/Patients.model";
 // Get all appointments
 export const getAllAppointments = async (
   pagination: Pagination,
-  filters?: Filters
+  filters?: AdminFilters
 ) => {
   const pageNumber = pagination["page"] <= 0 ? 1 : pagination["page"];
   const limit = pagination["limit"];
   const offset = (pageNumber - 1) * limit;
-  if (filters) {
+
+  if (filters && !filters["orderByPatient"] && !filters["orderByDoctor"] ) {
+    console.log(filters);
     try {
       const appointments = await Appointments.findAll({
         where: {
@@ -33,16 +35,37 @@ export const getAllAppointments = async (
     } catch (error) {
       return error;
     }
-  } else {
+  }
+
+  if (filters && (Object.keys(filters).includes("orderByPatient") || Object.keys(filters).includes("orderByDoctor"))) {
+    const order = Object.keys(filters).includes("orderByPatient")
+      ? (["id_patient", filters["orderByPatient"]] as OrderItem)
+      : (["id_doctor", filters["orderByDoctor"]] as OrderItem);
     try {
       const appointments = await Appointments.findAll({
         offset: offset,
         limit: limit,
+        order: [order]
       });
-      return appointments;
+      if(appointments.length) {
+        return appointments;
+      } else {
+        return ({info: "No results were found!"})
+      }
     } catch (error) {
       return error;
     }
+  } 
+
+  try {
+    console.log("sin filters")
+    const appointments = await Appointments.findAll({
+      offset: offset,
+      limit: limit,
+    });
+    return appointments;
+  } catch (error) {
+    return error;
   }
 };
 
@@ -175,7 +198,6 @@ export const getDoctorAppointments = async (
     const order = Object.keys(filters).includes("orderByPatient")
       ? (["id_patient", filters["orderByPatient"]] as OrderItem)
       : (["date", filters["orderByDate"]] as OrderItem);
-      console.log(order);
     try {
       const appointments = await Appointments.findAll({
         where: {

@@ -4,6 +4,8 @@ export type AdminFilters = {
   id_patient?: number;
   id_doctor?: number;
   status?: boolean;
+  orderByPatient?: "ASC" | "DESC";
+  orderByDoctor?: "ASC" | "DESC";
 };
 export type DoctorFilters = {
   id_patient?: number;

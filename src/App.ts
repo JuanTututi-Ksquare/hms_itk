@@ -6,6 +6,7 @@ import { PatientRouter } from "./routes/Patient.routes";
 import { AdminRouter } from "./routes/Admin.routes";
 import { DoctorsRouter } from "./routes/Doctor.routes";
 import { AuthRouter } from "./routes/Auth.routes";
+import { ContactRouter } from "./routes/Contact.routes";
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.use("/patient", PatientRouter);
 app.use("/admin", AdminRouter);
 app.use("/doctor", DoctorsRouter);
 app.use("/disable", AuthRouter);
+app.use("/contact", ContactRouter);
 
 app.get("/", (req: Request, res: Response) => {
   res.send(req.originalUrl);
