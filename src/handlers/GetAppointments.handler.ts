@@ -70,7 +70,10 @@ export const getAllAppointments = async (
 };
 
 // Patient
-export const getPatientAppointments = async (uid: number) => {
+export const getPatientAppointments = async (uid: number, pagination: Pagination) => {
+  const page = pagination["page"];
+  const limit = pagination["limit"];
+  const offset = (page - 1) * limit;
   try {
     const patient = await Patients.findOne({
       where: {
@@ -85,6 +88,8 @@ export const getPatientAppointments = async (uid: number) => {
         id_patient: patient.id,
         status: true,
       },
+      offset: offset,
+      limit: limit,
     });
     if (!list.length) {
       return { info: "No results were found!" };
