@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import { body, param, validationResult } from "express-validator";
+import { Pagination } from "../config/CustomTypes";
 import { CreateAppointment } from "../handlers/CreateAppointment.handler";
 import { CreatePatient } from "../handlers/CreatePatient.handler";
 import { deletePatientAppointment } from "../handlers/DeleteAppointments.handler";
@@ -101,8 +102,28 @@ PatientRouter.get(
   checkExistingPatient,
   async (req: Request, res: Response) => {
     const { uid } = res.locals;
+    const pagination: Pagination = {page: 1, limit: 10};
+
+    if (req.query.page && typeof req.query.page === "string") {
+      const page = +req.query.page;
+      if (!Number.isNaN(page)) {
+        pagination["page"] = page;
+      } else {
+        res.status(400).send({ error: "Invalid request!" });
+      }
+    }
+
+    if (req.query.limit && typeof req.query.limit === "string") {
+      const limit = +req.query.limit;
+      if (!Number.isNaN(limit)) {
+        pagination["limit"] = limit;
+      } else {
+        res.status(400).send({ error: "Invalid request!" });
+      }
+    }
+    
     try {
-      const appointments = await getPatientAppointments(uid);
+      const appointments = await getPatientAppointments(uid, pagination);
       res.status(200).send(appointments);
     } catch (error) {
       res
