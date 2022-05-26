@@ -1,18 +1,50 @@
 import { Router, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
+import { AdminFilters } from "../config/CustomTypes";
 import { ActivateUser } from "../handlers/ActivateUser.handler";
+import { CreateAdmin } from "../handlers/CreateAdmin.handler";
 import { CreateDoctor } from "../handlers/CreateDoctor.handler";
-import {
-  getAllAppointments,
-  getAllAppointmentsByDoctor,
-  getAllAppointmentsByPatient,
-  getAllAppointmentsByStatus,
-} from "../handlers/GetAppointments.handler";
+import { getAllAppointments } from "../handlers/GetAppointments.handler";
 import { checkAuth } from "../middlewares/Auth.validator";
 import { checkInactiveUser } from "../middlewares/Exists.validator";
 import { roleValidator } from "../middlewares/Role.validator";
 
 export const AdminRouter = Router();
+
+// Create admin
+AdminRouter.post(
+  "/",
+  checkAuth,
+  roleValidator([]),
+  body("first_name").exists().isLength({ min: 2 }),
+  body("last_name").exists().isLength({ min: 2 }),
+  body("birthdate").exists().isDate().isBefore(),
+  body("email").exists().isEmail(),
+  body("password").exists().isLength({ min: 6 }),
+  async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+    const {
+      first_name,
+      last_name,
+      birthdate,
+      email,
+      password,
+      role,
+    } = req.body;
+    if (role !== "admin") {
+      return res.status(400).send({error: "Invalid request: Invalid role!"});
+    }
+    try {
+      await CreateAdmin(first_name, last_name, birthdate, email, password, role);
+      res.status(201).send({success: "Admin user created successfully!"})
+    } catch (error) {
+      res.status(500).send({error: "Internal server error, please try again later!"})
+    }
+  }
+);
 
 // Create a Doctor
 AdminRouter.post(
@@ -47,10 +79,10 @@ AdminRouter.post(
       role,
     } = req.body;
     if (role !== "doctor") {
-      return res.status(400).send("Something went wrong :(");
+      return res.status(400).send({error: "Invalid request: Invalid role!"});
     }
     try {
-      const doctor = await CreateDoctor(
+      await CreateDoctor(
         first_name,
         last_name,
         birthdate,
@@ -60,7 +92,7 @@ AdminRouter.post(
         password,
         role
       );
-      res.status(201).send(doctor);
+      res.status(201).send({success: "Doctor user created successfully!"});
     } catch (error) {
       res
         .status(500)
@@ -79,8 +111,8 @@ AdminRouter.patch(
   async (req: Request, res: Response) => {
     const { id_user } = req.body;
     try {
-      const user = await ActivateUser(id_user);
-      res.status(200).send(user);
+      await ActivateUser(id_user);
+      res.status(200).send({success: "User activated successfully!"});
     } catch (error) {
       res
         .status(500)
@@ -95,32 +127,72 @@ AdminRouter.get(
   checkAuth,
   roleValidator(["admin"]),
   async (req: Request, res: Response) => {
+    let filters: AdminFilters = {};
+    let pagination: { page: number; limit: number } = { page: 1, limit: 10 };
     try {
       // Filter by patient
       if (typeof req.query.patient === "string") {
-        const id_patient = <string>req.query.patient;
-        const appointments = await getAllAppointmentsByPatient(+id_patient);
-        res.status(200).send(appointments);
-      } 
-      // Filter by doctor
-      else if (typeof req.query.doctor === "string") {
-        const id_doctor = req.query.doctor;
-        const appointments = await getAllAppointmentsByDoctor(+id_doctor);
-        res.status(200).send(appointments);
-      } 
-      // Filter by status
-      else if (typeof req.query.status === "string") {
-        const status = req.query.status;
-        const appointments = await getAllAppointmentsByStatus(status);
-        res.status(200).send(appointments);
+        const id_patient = +req.query.patient;
+        if (!Number.isNaN(id_patient)) {
+          filters = { ...filters, id_patient: +id_patient };
+        } else {
+          res.status(400).send({error: "Invalid request!"});
+        }
       }
-      // No filter
-      else if (!Object.keys(req.query).length) {
-        console.log(req.query);
-        const appointments = await getAllAppointments();
+
+      // Filter by doctor
+      if (typeof req.query.doctor === "string") {
+        const id_doctor = +req.query.doctor;
+        if (!Number.isNaN(id_doctor)) {
+          filters = { ...filters, id_doctor: +id_doctor };
+        } else {
+          res.status(400).send({error: "Invalid request!"});
+        }
+      }
+
+      // Filter by status
+      if (typeof req.query.status === "string") {
+        let status = true;
+        if (req.query.status === "true") {
+          status = true;
+          filters = { ...filters, status };
+        } else if (req.query.status === "false") {
+          status = false;
+          filters = { ...filters, status };
+        } else {
+          res.status(400).send({error: "Invalid request!"});
+        }
+      }
+
+      if (typeof req.query.page === "string") {
+        const page = +req.query.page;
+        if (typeof page === "number") {
+          pagination["page"] = +req.query.page;
+        } else {
+          res.status(400).send({error: "Invalid request!"});
+        }
+      }
+
+      if (typeof req.query.limit === "string") {
+        const limit = +req.query.limit;
+        if (typeof limit === "number") {
+          pagination["limit"] = +req.query.limit;
+        } else {
+          res.status(400).send({error: "Invalid request!"});
+        }
+      }
+      if (Object.keys(filters).length) {
+        const appointments = await getAllAppointments(pagination, filters);
         res.status(200).send(appointments);
       } else {
-        res.status(400).send({error: "Invalid request!"});        
+        if (!Object.keys(req.query).length ||
+        Object.keys(req.query).includes("page") ||
+        Object.keys(req.query).includes("limit") ) {
+          const appointments = await getAllAppointments(pagination);
+          res.status(200).send(appointments);
+        } else {
+          res.status(400).send({error: "Invalid request!"});
+        }
       }
     } catch (error) {
       res
@@ -129,11 +201,3 @@ AdminRouter.get(
     }
   }
 );
-
-AdminRouter.get("/doctors", async (req: Request, res: Response) => {
-  res.send("Create appointment middleware");
-});
-
-AdminRouter.get("/patients", async (req: Request, res: Response) => {
-  res.send("Get appointments middleware");
-});
