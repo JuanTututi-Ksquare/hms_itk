@@ -92,6 +92,10 @@ https://firebase.google.com/docs/admin/setup#:~:text=In%20the%20Firebase%20conso
 
 Once you have configured the SU for the project and added your Credentials file to the enviroment variables, you are ready to start the API.
 
+```env
+GOOGLE_APPLICATION_CREDENTIALS=C:\Users\user\Documents\hms-itk-firebase-adminsdk-6o8no-83e11be700.json
+```
+
 #### Current state of the Firebase Auth system
 The firebase Auth System will be initialized with the following users:
 
