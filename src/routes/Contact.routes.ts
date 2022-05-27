@@ -3,6 +3,7 @@ import { body } from "express-validator";
 import { CreateContactMessage } from "../handlers/CreateContactMessage.handler";
 import { GetContactMessages } from "../handlers/GetContactMessages.handler";
 import { checkAuth } from "../middlewares/Auth.validator";
+import { IsDeleted } from "../middlewares/IsDeleted.validator";
 import { roleValidator } from "../middlewares/Role.validator";
 
 export const ContactRouter = Router();
@@ -28,6 +29,8 @@ ContactRouter.post(
 ContactRouter.get(
     "/",
     checkAuth,
+    // Check if user is not deleted
+    IsDeleted,
     roleValidator(["admin"]),
     async (req: Request, res: Response) => {
         try {

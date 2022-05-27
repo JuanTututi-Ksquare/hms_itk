@@ -2,6 +2,7 @@ import { Request, Response, Router } from "express";
 import { DisableUser } from "../handlers/DisableUsers.handler";
 import { checkAuth } from "../middlewares/Auth.validator";
 import { checkExistingUser } from "../middlewares/Exists.validator";
+import { IsDeleted } from "../middlewares/IsDeleted.validator";
 import { roleValidator } from "../middlewares/Role.validator";
 
 export const AuthRouter = Router();
@@ -10,6 +11,8 @@ export const AuthRouter = Router();
 AuthRouter.delete(
   "/",
   checkAuth,
+  // Check if user is not deleted
+  IsDeleted,
   roleValidator(["admin", "doctor", "patient"]),
   checkExistingUser,
   async (req: Request, res: Response) => {

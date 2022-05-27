@@ -29,6 +29,7 @@ export const checkExistingPatient = async (
   }
 };
 
+
 export const checkExistingDoctor = async (
   req: Request,
   res: Response,

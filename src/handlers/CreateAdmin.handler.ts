@@ -32,6 +32,8 @@ export const CreateAdmin = async (
     await Admins.create({
       id_user: userCreated.id,
     });
+    console.log(`New admin created! ID: ${firebaseUser.uid} / Email: ${firebaseUser.email}`)
+    return ({success: "Admin created succesfully!"});
   } catch (error) {
       return error;
   }

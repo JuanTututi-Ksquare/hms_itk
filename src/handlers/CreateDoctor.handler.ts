@@ -19,6 +19,10 @@ export const CreateDoctor = async (
       email: email,
       password: password,
     });
+    console.log(firebaseUser);
+    if(!firebaseUser.email){
+      throw new Error("Something went wrong! :(");
+    }
     await firebaseAdmin.auth().setCustomUserClaims(firebaseUser.uid, { role });
     
     const userCreated = await Users.create({

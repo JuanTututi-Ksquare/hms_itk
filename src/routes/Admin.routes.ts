@@ -7,6 +7,7 @@ import { CreateDoctor } from "../handlers/CreateDoctor.handler";
 import { getAllAppointments } from "../handlers/GetAppointments.handler";
 import { checkAuth } from "../middlewares/Auth.validator";
 import { checkInactiveUser } from "../middlewares/Exists.validator";
+import { IsDeleted } from "../middlewares/IsDeleted.validator";
 import { roleValidator } from "../middlewares/Role.validator";
 
 export const AdminRouter = Router();
@@ -15,6 +16,8 @@ export const AdminRouter = Router();
 AdminRouter.post(
   "/",
   checkAuth,
+  // Check if user is not deleted
+  IsDeleted,
   roleValidator([]),
   body("first_name").exists().isLength({ min: 2 }),
   body("last_name").exists().isLength({ min: 2 }),
@@ -38,8 +41,7 @@ AdminRouter.post(
       return res.status(400).send({error: "Invalid request: Invalid role!"});
     }
     try {
-      await CreateAdmin(first_name, last_name, birthdate, email, password, role);
-      res.status(201).send({success: "Admin user created successfully!"})
+      res.send(await CreateAdmin(first_name, last_name, birthdate, email, password, role))
     } catch (error) {
       res.status(500).send({error: "Internal server error, please try again later!"})
     }
@@ -50,6 +52,8 @@ AdminRouter.post(
 AdminRouter.post(
   "/doctors",
   checkAuth,
+  // Check if user is not deleted
+  IsDeleted,
   roleValidator(["admin"]),
   //   First and last name must be at least 2 chars long
   body("first_name").exists().isLength({ min: 2 }),
@@ -82,7 +86,7 @@ AdminRouter.post(
       return res.status(400).send({error: "Invalid request: Invalid role!"});
     }
     try {
-      await CreateDoctor(
+      res.send(await CreateDoctor(
         first_name,
         last_name,
         birthdate,
@@ -91,8 +95,7 @@ AdminRouter.post(
         email,
         password,
         role
-      );
-      res.status(201).send({success: "Doctor user created successfully!"});
+      ));
     } catch (error) {
       res
         .status(500)
@@ -105,6 +108,8 @@ AdminRouter.post(
 AdminRouter.patch(
   "/users",
   checkAuth,
+  // Check if user is not deleted
+  IsDeleted,
   roleValidator(["admin"]),
   body("id_user").exists().isNumeric(),
   checkInactiveUser,
@@ -125,6 +130,8 @@ AdminRouter.patch(
 AdminRouter.get(
   "/appointments",
   checkAuth,
+  // Check if user is not deleted
+  IsDeleted,
   roleValidator(["admin"]),
   async (req: Request, res: Response) => {
     let filters: AdminFilters = {};

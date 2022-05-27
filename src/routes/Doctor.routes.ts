@@ -9,6 +9,7 @@ import {
   checkExistingAppointment,
   checkExistingDoctor,
 } from "../middlewares/Exists.validator";
+import { IsDeleted } from "../middlewares/IsDeleted.validator";
 import { roleValidator } from "../middlewares/Role.validator";
 
 export const DoctorsRouter = Router();
@@ -16,6 +17,8 @@ export const DoctorsRouter = Router();
 DoctorsRouter.get(
   "/appointments",
   checkAuth,
+  // Check if user is not deleted
+  IsDeleted,
   roleValidator(["doctor"]),
   checkExistingDoctor,
   async (req: Request, res: Response) => {
@@ -126,6 +129,8 @@ DoctorsRouter.patch(
   body("date").exists().isDate().isAfter(),
   param("id").exists().isNumeric(),
   checkAuth,
+  // Check if user is not deleted
+  IsDeleted,
   roleValidator(["doctor"]),
   checkExistingDoctor,
   checkExistingAppointment,

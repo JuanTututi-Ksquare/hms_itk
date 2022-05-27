@@ -15,6 +15,7 @@ import {
   checkExistingDoctor,
   checkExistingPatient,
 } from "../middlewares/Exists.validator";
+import { IsDeleted } from "../middlewares/IsDeleted.validator";
 import { roleValidator } from "../middlewares/Role.validator";
 
 export const PatientRouter = Router();
@@ -33,19 +34,18 @@ PatientRouter.post(
   body("password").exists().isLength({ min: 6 }),
   body("curp").exists().isString().isLength({ min: 18, max: 18 }),
   body("role").exists().isString().matches("patient"),
-  // Check if user is not deleted
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       // return res.status(422).json({ errors: errors.array() });
-      return res
+      res
         .status(400)
-        .send({ error: "Input error: Please verify the payload!" });
+        .send({ error: "Invalid request!" });
     }
     const { first_name, last_name, birthdate, email, password, curp, role } =
       req.body;
     try {
-      const createdPatient = await CreatePatient(
+      res.send(await CreatePatient(
         first_name,
         last_name,
         birthdate,
@@ -53,10 +53,9 @@ PatientRouter.post(
         password,
         curp,
         role
-      );
-      return res.status(201).send({success: "Patient user created successfully!"});
+      ));
     } catch (error) {
-      return res.status(500).send({ error: "Something went wrong" });
+      res.status(500).send({ error: "Something went wrong" });
     }
   }
 );
@@ -65,6 +64,8 @@ PatientRouter.post(
 PatientRouter.post(
   "/appointments",
   checkAuth,
+  // Check if user is not deleted
+  IsDeleted,
   roleValidator(["patient"]),
   body("id_doctor").exists().isInt(),
   body("date").exists().toDate().isAfter(),
@@ -98,6 +99,8 @@ PatientRouter.post(
 PatientRouter.get(
   "/appointments",
   checkAuth,
+  // Check if user is not deleted
+  IsDeleted,
   roleValidator(["patient"]),
   checkExistingPatient,
   async (req: Request, res: Response) => {
@@ -137,6 +140,8 @@ PatientRouter.get(
 PatientRouter.get(
   "/appointments/:id",
   checkAuth,
+  // Check if user is not deleted
+  IsDeleted,
   roleValidator(["patient"]),
   param("id").exists().isNumeric(),
   checkPatientAssociation,
@@ -163,6 +168,8 @@ PatientRouter.get(
 PatientRouter.delete(
   "/appointments/:id",
   checkAuth,
+  // Check if user is not deleted
+  IsDeleted,
   roleValidator(["patient"]),
   param("id").exists().isNumeric(),
   checkPatientAssociation,
