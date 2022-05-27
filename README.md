@@ -50,7 +50,7 @@ The password for logging in as a SU is the following:
 
 ```ts
 {
-  pw: "Post1984@"
+  pw: "Fire1984@"
 }
 ```
 
