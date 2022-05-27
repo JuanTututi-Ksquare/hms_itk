@@ -41,38 +41,49 @@ This API uses a Super User to perform certain tasks, for example, create new Adm
 You need to register the user using Firebase Auth, once you have registered it, firebase will create a UID that references the user, also it will have an email and password. Please keep this information secret!
 
 It is necessary that the email of the SU is kept as a Environment Variable in order to be checked for some of the middlewares:
-```
-SUPER_USER="deus-ex-machina@su_email.com"
+
+```env
+SUPER_USER="deus-ex-machina@admin.com"
 ```
 
+The password for logging in as a SU is the following:
+
+```ts
+{
+  pw: "Post1984@"
+}
+```
+
+In the next section, you will find the id of the user for the function where it is needed.
+
 #### Setting the SU in the project
-In order to insert the SU inside of our database we need locate the file "PopulateModels.config.ts" it can be found inside /src/config folder. There you will find a function where you need to type the data for your SU:
+In order to insert the SU inside of our database we need locate the file "PopulateModels.config.ts" it can be found inside /src/config folder. There you will find a function where you need to type the data for your SU, in this case all the information about the SU is already inside the code of the file:
 
 ```ts
 export const createSU = async () => {
-  // This function will create the user in the Users Table
   const super_user = await Users.findOrCreate({
     where: {
-      id: "" // This will be the uid created by firebase
+      id: "PuZdRtsIAtXAUxNd1Jmc0okbPxs2" // This is the id for the SU
     },
     defaults: {
-      id: "", // This will be the uid created by firebase
-      birthdate: new Date("1984-12-24"), // This will be the date of birth of SU
-      first_name: "Deus", // This will be the name of the SU
-      last_name: "Machina", // This will be the last name of the SU
+      id: "PuZdRtsIAtXAUxNd1Jmc0okbPxs2",
+      birthdate: new Date("1984-12-24"),
+      first_name: "Deus",
+      last_name: "Machina",
     }
   });
-  // This function will create the user in the Admins table
   Admins.findOrCreate({
     where: {
-      id_user: "" // This will be the uid created by firebase
+      id_user: "PuZdRtsIAtXAUxNd1Jmc0okbPxs2" // This is the id of the SU
     }, 
     defaults: {
-      id_user: "" // This will be the uid created by firebase
+      id_user: "PuZdRtsIAtXAUxNd1Jmc0okbPxs2" // This is the id of the SU
     } 
   })
 }
 ```
+
+This will automatically register the SU in the database when we start the server. Then if we restart the server it will prevent the SU to be registered again thanks to the squelize function [findOrCreate()]
 
 You also need to have a Google Credential File for using Firebase. You can get it by entering the link and following the instructions:
 
@@ -80,6 +91,11 @@ https://firebase.google.com/docs/admin/setup#:~:text=In%20the%20Firebase%20conso
 
 
 Once you have configured the SU for the project and added your Credentials file to the enviroment variables, you are ready to start the API.
+
+#### Current state of the Firebase Auth system
+The firebase Auth System will be initialized with the following users:
+
+
 
 ### Starting the API Service
 
