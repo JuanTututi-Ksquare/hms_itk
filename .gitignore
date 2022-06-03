@@ -2,4 +2,4 @@ node_modules/
 dist/
 .env
 /test.js
-/users.txt
+node_modules

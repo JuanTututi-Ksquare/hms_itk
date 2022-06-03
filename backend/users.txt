@@ -1,0 +1,124 @@
+ADMINS: 
+
+{
+	"first_name": "Deus",
+	"last_name": "Machina",
+	"birthdate": "1984-12-23",
+	"email": "deus-ex-machina@admin.com"
+	"password": "Fire1984@",
+	"role": "admin"
+},
+{
+	"first_name": "Alucard",
+	"last_name": "Tepes",
+	"birthdate": "1700-12-24",
+	"email": "alucard-hellsing@itk.com",
+	"password": "Integra123",
+	"role": "admin"
+},
+{
+	"first_name": "Turin",
+	"last_name": "Turambar",
+	"birthdate": "2001-10-10",
+	"email": "gondolin@itk.com",
+	"password": "kal123",
+	"role": "admin"
+}
+
+PATIENTS:
+
+{
+	"first_name": "John",
+	"last_name": "Marston",
+	"birthdate": "1994-02-21",
+	"email": "redemption@outlook.com",
+	"password": "john123",
+	"curp": "TUAJ940221HMNTVN04",
+	"role": "patient"
+},
+
+{
+	"first_name": "Arthur",
+	"last_name": "Morgan",
+	"birthdate": "1990-02-08",
+	"email": "ambarino@itk.com",
+	"password": "arthur123",
+	"curp": "RECA900208QTNRXT10",
+	"role": "patient"
+},
+
+{
+	"first_name": "Raiden",
+	"last_name": "Cyborg",
+	"birthdate": "1997-12-12",
+	"email": "jack@itk.com",
+	"password": "jack123",
+	"curp": "JACK900208QTNRXT10",
+	"role": "patient"
+}
+
+{
+	"first_name": "Nero",
+	"last_name": "Burnout",
+	"birthdate": "1990-01-01",
+	"email": "nero@itk.com",
+	"password": "nero123",
+	"curp": "NERO900208QTNRXT10",
+	"role": "patient"
+}
+
+{
+	"first_name": "Dante",
+	"last_name": "Swordsoul",
+	"birthdate": "1900-12-12",
+	"email": "dante@itk.com",
+	"password": "dante123",
+	"curp": "DSTE900208QTNRXT10",
+	"role": "patient"
+}
+
+DOCTORS:
+
+{
+	"first_name": "Naomi",
+	"last_name": "Hunter",
+	"birthdate": "1954-04-22",
+	"email": "frank_jaeger@itk.com",
+	"password": "Zanzibar",
+	"license": "FE47WX15EF",
+	"id_area": 1,
+	"role": "doctor"
+},
+
+{
+	"first_name": "David",
+	"last_name": "Hayter",
+	"birthdate": "1954-04-22",
+	"email": "solid_snake@itk.com",
+	"password": "ShadowMoses",
+	"license": "FE47WX15EF",
+	"id_area": 2,
+	"role": "doctor"
+}
+
+{
+	"first_name": "Revolver",
+	"last_name": "Ocelot",
+	"birthdate": "1944-04-22",
+	"email": "revolver@itk.com",
+	"password": "Zanzibar",
+	"license": "RE57WX15EF",
+	"id_area": 3,
+	"role": "doctor"
+}
+
+{
+	"first_name": "Donald",
+	"last_name": "Anderson",
+	"birthdate": "1932-04-22",
+	"email": "rex@itk.com",
+	"password": "ShadowMoses",
+	"license": "MG17WX15EF",
+	"id_area": 4,
+	"role": "doctor"
+}
