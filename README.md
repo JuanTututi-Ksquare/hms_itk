@@ -96,6 +96,18 @@ Once you have configured the SU for the project and added your Credentials file 
 GOOGLE_APPLICATION_CREDENTIALS=C:\Users\user\Documents\hms-itk-firebase-adminsdk-6o8no-83e11be700.json
 ```
 
+Also, here's the firebase config file to use in the front end:
+```js
+export const firebaseConfig = {
+  apiKey: "AIzaSyA7BLURcDVe8PvW1Bl6WfgsMCElFyxMICs",
+  authDomain: "hms-itk.firebaseapp.com",
+  projectId: "hms-itk",
+  storageBucket: "hms-itk.appspot.com",
+  messagingSenderId: "631312847126",
+  appId: "1:631312847126:web:812c8949252b62abff0037"
+};
+```
+
 #### Current state of the Firebase Auth system
 The firebase Auth System will be initialized with the following users:
 
