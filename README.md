@@ -108,11 +108,6 @@ export const firebaseConfig = {
 };
 ```
 
-#### Current state of the Firebase Auth system
-The firebase Auth System will be initialized with the following users:
-
-
-
 ### Starting the API Service
 
 #### Compile the files
