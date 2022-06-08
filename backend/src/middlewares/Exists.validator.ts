@@ -104,7 +104,7 @@ export const checkInactiveUser = async (
     if (inactiveUser) {
       return next();
     } else {
-      return res.status(404).send({error: `User doesn't exists!`});
+      return res.status(404).send({error: `User doesn't exists!`}); // exist*
     }
   } catch (error) {
     return res.status(500).send({error: "Internal server error, please try again later! :("});

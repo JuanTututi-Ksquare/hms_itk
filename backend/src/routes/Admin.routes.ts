@@ -18,7 +18,7 @@ AdminRouter.post(
   checkAuth,
   // Check if user is not deleted
   IsDeleted,
-  roleValidator([]),
+  roleValidator([]), // Don't you need to put here ["admin"]?
   body("first_name").exists().isLength({ min: 2 }),
   body("last_name").exists().isLength({ min: 2 }),
   body("birthdate").exists().isDate().isBefore(),
@@ -37,6 +37,7 @@ AdminRouter.post(
       password,
       role,
     } = req.body;
+    // If your endpoint already tells you that you are going to create an admin, then you don't need to receive and validate a role
     if (role !== "admin") {
       return res.status(400).send({error: "Invalid request: Invalid role!"});
     }
@@ -66,6 +67,7 @@ AdminRouter.post(
   body("password").exists().isLength({ min: 6 }),
   body("license").exists().isLength({ min: 10, max: 10 }),
   body("id_area").exists().isInt({ min: 1, max: 9 }),
+  // If your endpoint already tells you that you are going to create a doctor, then you don't need to receive a role
   body("role").exists().isString().matches("doctor"),
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
@@ -82,6 +84,7 @@ AdminRouter.post(
       id_area,
       role,
     } = req.body;
+    // If your endpoint already tells you that you are going to create a doctor, then you don't need to receive and validate a role
     if (role !== "doctor") {
       return res.status(400).send({error: "Invalid request: Invalid role!"});
     }
@@ -139,7 +142,7 @@ AdminRouter.get(
     // Filter by patient
     if (req.query.patient && typeof req.query.patient === "string") {
       const id_patient = +req.query.patient;
-      if (!Number.isNaN(id_patient)) {
+      if (!Number.isNaN(id_patient)) { // Remember to use the validation with parseInt
         filters = { ...filters, id_patient: +id_patient };
       } else {
         res.status(400).send({error: "Invalid request!"});
@@ -149,7 +152,7 @@ AdminRouter.get(
     // Filter by doctor
     if (req.query.doctor && typeof req.query.doctor === "string") {
       const id_doctor = +req.query.doctor;
-      if (!Number.isNaN(id_doctor)) {
+      if (!Number.isNaN(id_doctor)) { // Remember to use the validation with parseInt
         filters = { ...filters, id_doctor: +id_doctor };
       } else {
         res.status(400).send({error: "Invalid request!"});
@@ -159,6 +162,7 @@ AdminRouter.get(
     // Filter by status
     if (req.query.status && typeof req.query.status === "string") {
       let status = true;
+      // You can use express-validator for query params too
       if (req.query.status === "true") {
         status = true;
         filters = { ...filters, status };
@@ -216,6 +220,7 @@ AdminRouter.get(
         const appointments = await getAllAppointments(pagination, filters);
         res.status(200).send(appointments);
       } else {
+        // You can use "else if" here
         if (!Object.keys(req.query).length ||
         Object.keys(req.query).includes("page") ||
         Object.keys(req.query).includes("limit") ) {

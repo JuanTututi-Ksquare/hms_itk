@@ -33,6 +33,7 @@ PatientRouter.post(
   //   Password must be at least 6 chars
   body("password").exists().isLength({ min: 6 }),
   body("curp").exists().isString().isLength({ min: 18, max: 18 }),
+  // You don't need to send the role in the sub-domain for patients
   body("role").exists().isString().matches("patient"),
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
@@ -109,7 +110,7 @@ PatientRouter.get(
 
     if (req.query.page && typeof req.query.page === "string") {
       const page = +req.query.page;
-      if (!Number.isNaN(page)) {
+      if (!Number.isNaN(page)) { // Remember to use the validation with parseInt
         pagination["page"] = page;
       } else {
         res.status(400).send({ error: "Invalid request!" });
@@ -118,7 +119,7 @@ PatientRouter.get(
 
     if (req.query.limit && typeof req.query.limit === "string") {
       const limit = +req.query.limit;
-      if (!Number.isNaN(limit)) {
+      if (!Number.isNaN(limit)) { // Remember to use the validation with parseInt
         pagination["limit"] = limit;
       } else {
         res.status(400).send({ error: "Invalid request!" });
@@ -176,7 +177,7 @@ PatientRouter.delete(
   async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
-      const appointment = await deletePatientAppointment(+id);
+      const appointment = await deletePatientAppointment(+id); // Unused variable
       res.status(200).send({sucess: "Appointment deleted successfully!"});
     } catch (error) {
       res.status(500).send({error: "Internal server error, please try again later!"})

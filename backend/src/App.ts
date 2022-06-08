@@ -2,6 +2,7 @@ import express, {Request, Response} from "express";
 import dotenv from "dotenv";
 import { initializeApp } from 'firebase-admin/app';
 import { DBConn } from "./models/Index.model"
+// You can create an index.tf file in the routes folder to centralized the imports and exports
 import { PatientRouter } from "./routes/Patient.routes";
 import { AdminRouter } from "./routes/Admin.routes";
 import { DoctorsRouter } from "./routes/Doctor.routes";
@@ -27,10 +28,13 @@ app.use("/doctor", DoctorsRouter);
 app.use("/disable", AuthRouter);
 app.use("/contact", ContactRouter);
 
+// Please remove this unused part of the code
 app.get("/", (req: Request, res: Response) => {
   res.send(req.originalUrl);
 });
-
+// As a recommendation, I would wrap the startSequelize function in a promise, and when everything is done,
+// inside the then statement, I would call the app.listen. We always want to init the server after all
+// initializations
 try {
   DBConn(db_name, db_username, db_password, db_host);
   console.log("Connection to DB succesful! :)");

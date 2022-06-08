@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { Role } from "../config/CustomTypes";
 
 export const roleValidator = (roles: Role[]) => {
-    return(req: Request, res: Response, next: Function) => {
+    return(req: Request, res: Response, next: Function) => { // There is an interface in express called NextFunction
         const {email, role} = res.locals;
 
         if (email === process.env.SUPER_USER) {

@@ -11,7 +11,7 @@ export const IsDeleted = async (req: Request, res: Response, next: Function) => 
             }
         })
         if (user) {
-            res.status(404).send({error: "User doesn't exists!"});
+            res.status(404).send({error: "User doesn't exists!"}); // exist*
         } else {
             return next();
         }
