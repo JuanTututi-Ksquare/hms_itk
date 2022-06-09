@@ -68,7 +68,7 @@ DoctorsRouter.get(
 
     if (req.query.patient && typeof req.query.patient === "string") {
       const id_patient = +req.query.patient;
-      if (!Number.isNaN(id_patient)) {
+      if (!Number.isNaN(id_patient)) { // Remember to use the validation with parseInt
         filters = { ...filters, id_patient: id_patient };
       } else {
         res.status(400).send({ error: "Invalid request!" });
@@ -77,7 +77,7 @@ DoctorsRouter.get(
 
     if (req.query.page && typeof req.query.page === "string") {
       const page = +req.query.page;
-      if (!Number.isNaN(page)) {
+      if (!Number.isNaN(page)) { // Remember to use the validation with parseInt
         pagination["page"] = page;
       } else {
         res.status(400).send({ error: "Invalid request!" });
@@ -86,7 +86,7 @@ DoctorsRouter.get(
 
     if (req.query.limit && typeof req.query.limit === "string") {
       const limit = +req.query.limit;
-      if (!Number.isNaN(limit)) {
+      if (!Number.isNaN(limit)) { // Remember to use the validation with parseInt
         pagination["limit"] = limit;
       } else {
         res.status(400).send({ error: "Invalid request!" });

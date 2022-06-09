@@ -30,7 +30,7 @@ export const getAllAppointments = async (
       if (appointments.length) {
         return appointments;
       } else {
-        return { info: "No results were found!" };
+        return { info: "No results were found!" }; // You must return an empty array
       }
     } catch (error) {
       return error;
@@ -50,7 +50,7 @@ export const getAllAppointments = async (
       if(appointments.length) {
         return appointments;
       } else {
-        return ({info: "No results were found!"})
+        return ({info: "No results were found!"}) // You must return an empty array
       }
     } catch (error) {
       return error;
@@ -88,11 +88,13 @@ export const getPatientAppointments = async (uid: number, pagination: Pagination
         id_patient: patient.id,
         status: true,
       },
+      // You can use just "offset"
       offset: offset,
+      // You can use just "limit"
       limit: limit,
     });
     if (!list.length) {
-      return { info: "No results were found!" };
+      return { info: "No results were found!" }; // You should return an empty array
     } else {
       return list;
     }
@@ -112,6 +114,8 @@ export const getSinglePatientAppointment = async (id_appointment: number) => {
     if (appointment) {
       return appointment;
     } else {
+      // Some clients will ask you that you return 404 here, because you are asking
+      // for an specific resource.
       return { info: "No results were found!" };
     }
   } catch (error) {
@@ -150,18 +154,21 @@ export const getDoctorAppointments = async (
       const appointments = await Appointments.findAll({
         where: {
           ...otherFilters,
+          // only id_doctor
           id_doctor: id_doctor,
           date: { [Op.between]: [initialDate, endDate] },
           status: true,
         },
+        // only offset
         offset: offset,
+        // only limit
         limit: limit,
         order: [...order],
       });
       if (appointments.length) {
         return appointments;
       } else {
-        return { info: "No results were found!" };
+        return { info: "No results were found!" }; // you must return an empty array
       }
     } catch (error) {
       return error;
@@ -179,16 +186,19 @@ export const getDoctorAppointments = async (
       const appointments = await Appointments.findAll({
         where: {
           ...filters,
+          // only id_doctor
           id_doctor: id_doctor,
           status: true,
         },
+        // only offset
         offset: offset,
+        // only limit
         limit: limit,
       });
       if (appointments.length) {
         return appointments;
       } else {
-        return { info: "No results were found!" };
+        return { info: "No results were found!" }; // you must return an empty array
       }
     } catch (error) {
       return error;
@@ -206,17 +216,20 @@ export const getDoctorAppointments = async (
     try {
       const appointments = await Appointments.findAll({
         where: {
+          // only id_doctor
           id_doctor: id_doctor,
           status: true,
         },
+        // only offset
         offset: offset,
+        // only limit
         limit: limit,
         order: [order],
       });
       if (appointments.length) {
         return appointments;
       } else {
-        return { info: "No results were found!" };
+        return { info: "No results were found!" }; // you must return an empty array
       }
     } catch (error) {
       return error;
@@ -226,16 +239,19 @@ export const getDoctorAppointments = async (
   try {
     const appointments = await Appointments.findAll({
       where: {
+        // only doctor
         id_doctor: id_doctor,
         status: true,
       },
+      // only offset
       offset: offset,
+      // only limit
       limit: limit,
     });
     if (appointments.length) {
       return appointments;
     } else {
-      return { info: "No results were found!" };
+      return { info: "No results were found!" }; // you must return an empty array
     }
   } catch (error) {
     return error;

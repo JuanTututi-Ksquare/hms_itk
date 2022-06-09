@@ -16,7 +16,9 @@ export const CreateDoctor = async (
   try {
     const firebaseUser = await firebaseAdmin.auth().createUser({
       displayName: `${first_name} ${last_name}`,
+      // you can use just "email"
       email: email,
+      // you can use just "password"
       password: password,
     });
     console.log(firebaseUser);
@@ -27,17 +29,22 @@ export const CreateDoctor = async (
     
     const userCreated = await Users.create({
       id: firebaseUser.uid,
+      // you can use just "first_name"
       first_name: first_name,
+      // you can use just "last_name"
       last_name: last_name,
+      // you can use just "birthdate_name"
       birthdate: birthdate,
     });
     await Doctors.create({
       id_user: userCreated.id,
+      // you can use just "license"
       license: license,
+      // you can use just "id_area"
       id_area: id_area
     });
     console.log(`New doctor created! ID: ${firebaseUser.uid} / Email: ${firebaseUser.email}`)
-    return ({success: "Doctor created succesfully!"});
+    return ({success: "Doctor created succesfully!"}); // Please return the ID that your front is going to use
   } catch (error) {
     return error;
   }

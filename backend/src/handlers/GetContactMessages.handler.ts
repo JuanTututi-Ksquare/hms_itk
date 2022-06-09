@@ -6,7 +6,7 @@ export const GetContactMessages = async() => {
         if(messages.length) {
             return messages;
         } else {
-            return {info: "No results were found!"}
+            return {info: "No results were found!"} // you must return an empty array
         }
     } catch (error) {
         return error;
