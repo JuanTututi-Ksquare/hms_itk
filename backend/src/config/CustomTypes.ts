@@ -1,5 +1,6 @@
 export type Role = "patient" | "doctor" | "admin";
 export type Pagination = { page: number; limit: number };
+export type firebaseUser = { first_name: string,  last_name: string, email: string, password: string, role: Role}
 export type AdminFilters = {
   id_patient?: number;
   id_doctor?: number;

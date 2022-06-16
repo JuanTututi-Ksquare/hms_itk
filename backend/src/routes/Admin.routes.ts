@@ -1,5 +1,6 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, query } from "express";
 import { body, validationResult } from "express-validator";
+import { badRequest, internalServerError } from "../config/CustomRespones";
 import { AdminFilters } from "../config/CustomTypes";
 import { ActivateUser } from "../handlers/ActivateUser.handler";
 import { CreateAdmin } from "../handlers/CreateAdmin.handler";
@@ -27,23 +28,17 @@ AdminRouter.post(
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() });
+      return res
+        .status(400)
+        .json({ ...badRequest, errors: errors.array() });
     }
-    const {
-      first_name,
-      last_name,
-      birthdate,
-      email,
-      password,
-      role,
-    } = req.body;
-    if (role !== "admin") {
-      return res.status(400).send({error: "Invalid request: Invalid role!"});
-    }
+    const { first_name, last_name, birthdate, email, password } = req.body;
     try {
-      res.send(await CreateAdmin(first_name, last_name, birthdate, email, password, role))
+      return res.send(
+        await CreateAdmin(first_name, last_name, birthdate, email, password)
+      );
     } catch (error) {
-      res.status(500).send({error: "Internal server error, please try again later!"})
+      return res.status(500).send(internalServerError);
     }
   }
 );
@@ -56,21 +51,52 @@ AdminRouter.post(
   IsDeleted,
   roleValidator(["admin"]),
   //   First and last name must be at least 2 chars long
-  body("first_name").exists().isLength({ min: 2 }),
-  body("last_name").exists().isLength({ min: 2 }),
+  body("first_name")
+    .exists()
+    .withMessage("First name is missing from request body")
+    .isLength({ min: 2 })
+    .withMessage("First name must contain at least 2 chars"),
+  body("last_name")
+    .exists()
+    .withMessage("Last name is missing from request body")
+    .isLength({ min: 2 })
+    .withMessage("Last name must contain at least 2 chars"),
   //   Birthdate must be before current date
-  body("birthdate").exists().isDate().isBefore(),
+  body("birthdate")
+    .exists()
+    .withMessage("Birthdate is missing from request body")
+    .isDate()
+    .withMessage("Birthdate must be a valid date")
+    .isBefore()
+    .withMessage("Birthdate must be a past date"),
   //   Email has to be on correct format
-  body("email").exists().isEmail(),
+  body("email")
+    .exists()
+    .withMessage("Email is missing from request body")
+    .isEmail()
+    .withMessage("Email must be a valid email address"),
   //   Password must be at least 6 chars
-  body("password").exists().isLength({ min: 6 }),
-  body("license").exists().isLength({ min: 10, max: 10 }),
-  body("id_area").exists().isInt({ min: 1, max: 9 }),
-  body("role").exists().isString().matches("doctor"),
+  body("password")
+    .exists()
+    .withMessage("Password is missing from request body")
+    .isLength({ min: 8 })
+    .withMessage("Password must be at least 8 chars long"),
+  body("license")
+    .exists()
+    .withMessage("License is missing from request body")
+    .isLength({ min: 10, max: 10 })
+    .withMessage("License must be at least 10 chars long"),
+  body("id_area")
+    .exists()
+    .withMessage("Area is missing from request body")
+    .isInt({ min: 1, max: 9 })
+    .withMessage("Area must be a valid hospital area"),
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() });
+      return res
+        .status(400)
+        .json({ ...badRequest, errors: errors.array() });
     }
     const {
       first_name,
@@ -80,26 +106,21 @@ AdminRouter.post(
       password,
       license,
       id_area,
-      role,
     } = req.body;
-    if (role !== "doctor") {
-      return res.status(400).send({error: "Invalid request: Invalid role!"});
-    }
     try {
-      res.send(await CreateDoctor(
-        first_name,
-        last_name,
-        birthdate,
-        license,
-        id_area,
-        email,
-        password,
-        role
-      ));
+      res.send(
+        await CreateDoctor(
+          first_name,
+          last_name,
+          birthdate,
+          license,
+          id_area,
+          email,
+          password
+        )
+      );
     } catch (error) {
-      res
-        .status(500)
-        .send({ error: "Internal server error, please try again later!" });
+      return res.status(500).send(internalServerError);
     }
   }
 );
@@ -117,11 +138,9 @@ AdminRouter.patch(
     const { id_user } = req.body;
     try {
       await ActivateUser(id_user);
-      res.status(200).send({success: "User activated successfully!"});
+      res.status(200).send({ success: "User activated successfully!" });
     } catch (error) {
-      res
-        .status(500)
-        .send({ error: "Internal server error, please try again later!" });
+      res.status(500).send(internalServerError);
     }
   }
 );
@@ -138,21 +157,21 @@ AdminRouter.get(
     let pagination: { page: number; limit: number } = { page: 1, limit: 10 };
     // Filter by patient
     if (req.query.patient && typeof req.query.patient === "string") {
-      const id_patient = +req.query.patient;
-      if (!Number.isNaN(id_patient)) {
+      const id_patient = req.query.patient;
+      if (!Number.isNaN(parseInt(id_patient, 10))) {
         filters = { ...filters, id_patient: +id_patient };
       } else {
-        res.status(400).send({error: "Invalid request!"});
+        res.status(400).send({ ...badRequest, error: "Invalid url query!" });
       }
     }
 
     // Filter by doctor
     if (req.query.doctor && typeof req.query.doctor === "string") {
-      const id_doctor = +req.query.doctor;
-      if (!Number.isNaN(id_doctor)) {
+      const id_doctor = req.query.doctor;
+      if (!Number.isNaN(parseInt(id_doctor, 10))) {
         filters = { ...filters, id_doctor: +id_doctor };
       } else {
-        res.status(400).send({error: "Invalid request!"});
+        res.status(400).send({ ...badRequest, error: "Invalid url query!" });
       }
     }
 
@@ -166,11 +185,11 @@ AdminRouter.get(
         status = false;
         filters = { ...filters, status };
       } else {
-        res.status(400).send({error: "Invalid request!"});
+        res.status(400).send({ ...badRequest, error: "Invalid url query!" });
       }
     }
 
-    if(req.query.order && typeof req.query.order === "string") {
+    if (req.query.order && typeof req.query.order === "string") {
       const splittedOrder = req.query.order.split("+");
       const index = splittedOrder[0];
       const order = splittedOrder[1];
@@ -179,8 +198,8 @@ AdminRouter.get(
         filters["orderByPatient"] = "ASC";
       } else if (index === "patient" && order === "DESC") {
         filters["orderByPatient"] = "DESC";
-      } else if(index === "patient") {
-        filters["orderByPatient"] = "ASC"
+      } else if (index === "patient") {
+        filters["orderByPatient"] = "ASC";
       }
 
       // Order by Doctor ID
@@ -188,27 +207,26 @@ AdminRouter.get(
         filters["orderByDoctor"] = "ASC";
       } else if (index === "doctor" && order === "DESC") {
         filters["orderByDoctor"] = "DESC";
-      } else if(index === "doctor") {
-        filters["orderByDoctor"] = "ASC"
+      } else if (index === "doctor") {
+        filters["orderByDoctor"] = "ASC";
       }
-
     }
 
     if (typeof req.query.page === "string") {
-      const page = +req.query.page;
-      if (typeof page === "number") {
-        pagination["page"] = +req.query.page;
+      const page = req.query.page;
+      if (!Number.isNaN(parseInt(page, 10))) {
+        pagination["page"] = +page;
       } else {
-        res.status(400).send({error: "Invalid request!"});
+        res.status(400).send({ ...badRequest, error: "Invalid url query!" });
       }
     }
 
     if (typeof req.query.limit === "string") {
-      const limit = +req.query.limit;
-      if (typeof limit === "number") {
-        pagination["limit"] = +req.query.limit;
+      const limit = req.query.limit;
+      if (!Number.isNaN(parseInt(limit, 10))) {
+        pagination["limit"] = +limit;
       } else {
-        res.status(400).send({error: "Invalid request!"});
+        res.status(400).send({ ...badRequest, error: "Invalid url query!" });
       }
     }
     try {
@@ -216,20 +234,20 @@ AdminRouter.get(
         const appointments = await getAllAppointments(pagination, filters);
         res.status(200).send(appointments);
       } else {
-        if (!Object.keys(req.query).length ||
-        Object.keys(req.query).includes("page") ||
-        Object.keys(req.query).includes("limit") ) {
+        if (
+          !Object.keys(req.query).length ||
+          Object.keys(req.query).includes("page") ||
+          Object.keys(req.query).includes("limit")
+        ) {
           console.log("sin filters 1");
           const appointments = await getAllAppointments(pagination);
           res.status(200).send(appointments);
         } else {
-          res.status(400).send({error: "Invalid request!"});
+          res.status(400).send({ ...badRequest, error: "Invalid url query!" });
         }
       }
     } catch (error) {
-      res
-        .status(500)
-        .send({ error: "Internal server error, please try again later!" });
+      res.status(500).send(internalServerError);
     }
   }
 );

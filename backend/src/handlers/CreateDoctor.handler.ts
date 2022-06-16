@@ -1,7 +1,7 @@
 import { Users } from "../models/Users.model";
 import { Doctors } from "../models/Doctors.model";
-import * as firebaseAdmin from "firebase-admin";
 import { Role } from "../config/CustomTypes";
+import { createFirebaseUser } from "./CreateFirebaseUser.handler";
 
 export const CreateDoctor = async (
   first_name: string,
@@ -10,34 +10,24 @@ export const CreateDoctor = async (
   license: string,
   id_area: number,
   email: string,
-  password: string,
-  role: Role
+  password: string
 ) => {
   try {
-    const firebaseUser = await firebaseAdmin.auth().createUser({
-      displayName: `${first_name} ${last_name}`,
-      email: email,
-      password: password,
-    });
-    console.log(firebaseUser);
-    if(!firebaseUser.email){
-      throw new Error("Something went wrong! :(");
-    }
-    await firebaseAdmin.auth().setCustomUserClaims(firebaseUser.uid, { role });
-    
+    const role: Role = "doctor";
+    const firebaseUser = await createFirebaseUser({first_name, last_name, email, password, role});
     const userCreated = await Users.create({
       id: firebaseUser.uid,
-      first_name: first_name,
-      last_name: last_name,
-      birthdate: birthdate,
+      first_name,
+      last_name,
+      birthdate,
     });
     await Doctors.create({
       id_user: userCreated.id,
-      license: license,
-      id_area: id_area
+      license,
+      id_area
     });
     console.log(`New doctor created! ID: ${firebaseUser.uid} / Email: ${firebaseUser.email}`)
-    return ({success: "Doctor created succesfully!"});
+    return ({success: "Doctor created successfully!", id: firebaseUser.uid});
   } catch (error) {
     return error;
   }

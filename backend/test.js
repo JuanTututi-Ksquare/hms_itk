@@ -1,6 +1,5 @@
-const test = (options) => {
-    re = new RegExp("/patients/\\d{1,}/$");
-    console.log(options.input.match(re));
+const test = (value) => {
+    console.log(!Number.isNaN(parseInt(value, 10)));
 }
 
-test({input: "/patients/2474751/"})
+test("10")
