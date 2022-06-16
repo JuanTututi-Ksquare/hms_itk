@@ -1,7 +1,8 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
+import { internalServerError } from "../config/CustomRespones";
 import { Users } from "../models/Users.model";
 
-export const IsDeleted = async (req: Request, res: Response, next: Function) => {
+export const IsDeleted = async (req: Request, res: Response, next: NextFunction) => {
     const {uid} = res.locals;
     try {
         const user = await Users.findOne({
@@ -11,11 +12,11 @@ export const IsDeleted = async (req: Request, res: Response, next: Function) => 
             }
         })
         if (user) {
-            res.status(404).send({error: "User doesn't exists!"});
+            res.status(404).json({error: "User doesn't exists!"});
         } else {
             return next();
         }
     } catch (error) {
-        res.status(500).send({error: "Internal server error, please try again later!"});
+        res.status(500).json(internalServerError);
     }
 }

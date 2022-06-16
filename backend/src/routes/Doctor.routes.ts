@@ -1,5 +1,6 @@
 import { Request, Response, Router } from "express";
-import { body, param } from "express-validator";
+import { body, param, validationResult } from "express-validator";
+import { badRequest } from "../config/CustomRespones";
 import { DoctorFilters, Pagination } from "../config/CustomTypes";
 import { getDoctorAppointments } from "../handlers/GetAppointments.handler";
 import { UpdateAppointmentDate } from "../handlers/UpdateAppointment.handler";
@@ -126,8 +127,8 @@ DoctorsRouter.get(
 
 DoctorsRouter.patch(
   "/appointments/:id",
-  body("date").exists().isDate().isAfter(),
-  param("id").exists().isNumeric(),
+  body("date").exists().withMessage("Date is missing").isDate().withMessage("Date is not a valid date").isAfter().withMessage("Date must be in the future"),
+  param("id").exists().withMessage("ID is missing").isNumeric().withMessage("ID must be a number"),
   checkAuth,
   // Check if user is not deleted
   IsDeleted,
@@ -136,6 +137,12 @@ DoctorsRouter.patch(
   checkExistingAppointment,
   checkDoctorAssociation,
   async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res
+        .status(400)
+        .json({ ...badRequest, errors: errors.array() });
+    }
     const { date } = req.body;
     const { id } = req.params;
     try {

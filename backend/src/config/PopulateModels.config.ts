@@ -1,6 +1,5 @@
 import { Admins } from "../models/Admins.model";
 import { Areas } from "../models/Areas.model";
-import { Patients } from "../models/Patients.model";
 import { Users } from "../models/Users.model";
 
 enum areas {
@@ -29,7 +28,7 @@ export const PopulateAreas = () => {
 };
 
 export const createSU = async () => {
-  const super_user = await Users.findOrCreate({
+  await Users.findOrCreate({
     where: {
       id: "PuZdRtsIAtXAUxNd1Jmc0okbPxs2"
     },

@@ -1,4 +1,5 @@
 import { Request, Response, Router } from "express";
+import { internalServerError } from "../config/CustomRespones";
 import { DisableUser } from "../handlers/DisableUsers.handler";
 import { checkAuth } from "../middlewares/Auth.validator";
 import { checkExistingUser } from "../middlewares/Exists.validator";
@@ -23,7 +24,7 @@ AuthRouter.delete(
     } catch (error) {
       res
         .status(500)
-        .send({ error: "Internal server error, please try again later! :(" });
+        .send(internalServerError);
     }
   }
 );

@@ -1,10 +1,10 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import * as admin from "firebase-admin";
 
 export const checkAuth = async (
   req: Request,
   res: Response,
-  next: Function
+  next: NextFunction
 ) => {
   const { authorization } = req.headers;
 

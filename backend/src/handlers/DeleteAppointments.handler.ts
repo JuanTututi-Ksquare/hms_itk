@@ -3,7 +3,7 @@ import { Appointments } from "../models/Appointments.model";
 export const deletePatientAppointment = async (id_appointment: number) => {
     try {
       Appointments.update({status: false}, {where: {id: id_appointment}})
-      return {success: "Appointment was deleted!"}
+      return {success: "Appointment was deleted successfully"}
     } catch (error) {
       return error;
     }

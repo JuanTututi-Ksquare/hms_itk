@@ -24,14 +24,10 @@ export const getAllAppointments = async (
         where: {
           ...filters,
         },
-        offset: offset,
-        limit: limit,
+        offset,
+        limit,
       });
-      if (appointments.length) {
-        return appointments;
-      } else {
-        return { info: "No results were found!" };
-      }
+      return appointments;
     } catch (error) {
       return error;
     }
@@ -43,15 +39,11 @@ export const getAllAppointments = async (
       : (["id_doctor", filters["orderByDoctor"]] as OrderItem);
     try {
       const appointments = await Appointments.findAll({
-        offset: offset,
-        limit: limit,
+        offset,
+        limit,
         order: [order]
       });
-      if(appointments.length) {
-        return appointments;
-      } else {
-        return ({info: "No results were found!"})
-      }
+      return appointments;
     } catch (error) {
       return error;
     }
@@ -60,8 +52,8 @@ export const getAllAppointments = async (
   try {
     console.log("sin filters")
     const appointments = await Appointments.findAll({
-      offset: offset,
-      limit: limit,
+      offset,
+      limit,
     });
     return appointments;
   } catch (error) {
@@ -88,14 +80,10 @@ export const getPatientAppointments = async (uid: number, pagination: Pagination
         id_patient: patient.id,
         status: true,
       },
-      offset: offset,
-      limit: limit,
+      offset,
+      limit,
     });
-    if (!list.length) {
-      return { info: "No results were found!" };
-    } else {
-      return list;
-    }
+    return list;
   } catch (error) {
     return error;
   }
@@ -109,11 +97,7 @@ export const getSinglePatientAppointment = async (id_appointment: number) => {
         status: true,
       },
     });
-    if (appointment) {
-      return appointment;
-    } else {
-      return { info: "No results were found!" };
-    }
+    return appointment;
   } catch (error) {
     return error;
   }
@@ -150,19 +134,15 @@ export const getDoctorAppointments = async (
       const appointments = await Appointments.findAll({
         where: {
           ...otherFilters,
-          id_doctor: id_doctor,
+          id_doctor,
           date: { [Op.between]: [initialDate, endDate] },
           status: true,
         },
-        offset: offset,
-        limit: limit,
+        offset,
+        limit,
         order: [...order],
       });
-      if (appointments.length) {
-        return appointments;
-      } else {
-        return { info: "No results were found!" };
-      }
+      return appointments;
     } catch (error) {
       return error;
     }
@@ -179,17 +159,13 @@ export const getDoctorAppointments = async (
       const appointments = await Appointments.findAll({
         where: {
           ...filters,
-          id_doctor: id_doctor,
+          id_doctor,
           status: true,
         },
-        offset: offset,
-        limit: limit,
+        offset,
+        limit,
       });
-      if (appointments.length) {
-        return appointments;
-      } else {
-        return { info: "No results were found!" };
-      }
+      return appointments;
     } catch (error) {
       return error;
     }
@@ -206,18 +182,14 @@ export const getDoctorAppointments = async (
     try {
       const appointments = await Appointments.findAll({
         where: {
-          id_doctor: id_doctor,
+          id_doctor,
           status: true,
         },
-        offset: offset,
-        limit: limit,
+        offset,
+        limit,
         order: [order],
       });
-      if (appointments.length) {
-        return appointments;
-      } else {
-        return { info: "No results were found!" };
-      }
+      return appointments;
     } catch (error) {
       return error;
     }
@@ -226,17 +198,13 @@ export const getDoctorAppointments = async (
   try {
     const appointments = await Appointments.findAll({
       where: {
-        id_doctor: id_doctor,
+        id_doctor,
         status: true,
       },
-      offset: offset,
-      limit: limit,
+      offset,
+      limit,
     });
-    if (appointments.length) {
-      return appointments;
-    } else {
-      return { info: "No results were found!" };
-    }
+    return appointments;
   } catch (error) {
     return error;
   }
