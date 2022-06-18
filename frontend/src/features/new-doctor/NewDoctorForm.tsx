@@ -1,35 +1,45 @@
 import React, { useState } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { useAppSelector } from "../../app/hooks";
 import { validateDate } from "../../common/helpers/validators";
-import styles from "./SignUpForm.module.css";
+import { selectLogin } from "../login/LoginSlice";
+import styles from "./NewDoctorForm.module.css"
 
-interface Patient {
+type Props = {
+  onSuccess: Function;
+};
+
+interface Doctor {
   firstName: string;
   lastName: string;
   birthDate: string;
   email: string;
   password: string;
   confirmPassword: string;
-  curp: string;
-  nss?: string;
+  license: string;
+  area: number;
 }
 
-interface Props {
-  onSuccess: Function;
-}
-
-export default function SignUpForm(props: Props) {
+function NewDoctorForm({ onSuccess }: Props) {
   const [passwordInput, setPasswordInput] = useState("");
   const [errorState, setErrorState] = useState("");
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+    reset,
+  } = useForm<Doctor>();
 
-  const registerPatient = async (data: Patient) => {
-    const { firstName, lastName, birthDate, email, password, curp, nss } = data;
-    fetch("http://localhost:3001/patient/", {
+  const token = useAppSelector(selectLogin).token;
+
+  const registerDoctor = async (data: Doctor) => {
+    const { firstName, lastName, birthDate, email, password, license, area } = data;
+    fetch("http://localhost:3001/admin/doctors", {
       method: "POST",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
       },
       body: JSON.stringify({
         first_name: firstName,
@@ -37,8 +47,8 @@ export default function SignUpForm(props: Props) {
         birthdate: birthDate,
         email,
         password,
-        curp,
-        nss
+        license,
+        id_area: area,
       }),
     }).then(
       (result) => {
@@ -46,7 +56,7 @@ export default function SignUpForm(props: Props) {
           if (content.code) {
             setErrorState("Ups! something went wrong :( try again later");
           } else {
-            props.onSuccess(email);
+            onSuccess(email);
           }
         });
       },
@@ -56,16 +66,9 @@ export default function SignUpForm(props: Props) {
     );
   };
 
-  const {
-    register,
-    formState: { errors },
-    handleSubmit,
-    reset,
-  } = useForm<Patient>();
-
-  const onSubmit: SubmitHandler<Patient> = (data) => {
+  const onSubmit: SubmitHandler<Doctor> = (data) => {
     setErrorState("");
-    registerPatient(data);
+    registerDoctor(data);
     reset();
   };
 
@@ -74,13 +77,9 @@ export default function SignUpForm(props: Props) {
       return "Password is not matching";
     }
   };
-
   return (
     <>
-      <h2>Create an account with your email</h2>
-      <p>
-        Already have an account? <Link to="/login">Log in</Link>
-      </p>
+      <h2>Create new Doctor account</h2>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className={styles["form-fields"]}>
           <div>
@@ -174,39 +173,44 @@ export default function SignUpForm(props: Props) {
             )}
           </div>
           <div>
-            <label htmlFor="curp">CURP *</label>
+            <label htmlFor="license">License Code *</label>
             <input
-              {...register("curp", {
+              {...register("license", {
                 required: "Please enter a valid CURP",
                 minLength: {
-                  value: 18,
-                  message: "CURP must be 18 characters long!",
+                  value: 10,
+                  message: "License Code must be 10 characters long",
                 },
                 maxLength: {
-                  value: 18,
-                  message: "CURP must be 18 characters long!",
+                  value: 10,
+                  message: "License Code must be 10 characters long",
                 },
               })}
               type="text"
               id="curp"
             />
-            {errors.curp && (
-              <p className="missing-field">{errors.curp.message}</p>
+            {errors.license && (
+              <p className="missing-field">{errors.license.message}</p>
             )}
           </div>
           <div>
-            <label htmlFor="nss">NSS</label>
-            <input
-              {...register("nss", {
-                required: false,
-                minLength: { value: 9, message: "NSS must be 9 digits long!" },
-                maxLength: { value: 9, message: "NSS must be 9 digits long!" },
-              })}
-              type="text"
-              id="nss"
-            />
-            {errors.nss && (
-              <p className="missing-field">{errors.nss.message}</p>
+            <label htmlFor="area">Area</label>
+            <select  id="area" {...register("area", {
+                required: "Area is missing",
+              })}>
+                <option value="" selected disabled>Select area</option>
+                <option value="1">Dermatology</option>
+                <option value="2">Internal Medicine</option>
+                <option value="3">Familiar Medicine</option>
+                <option value="4">Pediatry</option>
+                <option value="5">Gynecology</option>
+                <option value="6">Preventive Medicine</option>
+                <option value="7">Dentistry</option>
+                <option value="8">Radiology</option>
+                <option value="9">Cardiology</option>
+            </select>
+            {errors.area && (
+              <p className="missing-field">{errors.area.message}</p>
             )}
           </div>
           <input
@@ -224,3 +228,5 @@ export default function SignUpForm(props: Props) {
     </>
   );
 }
+
+export default NewDoctorForm;

@@ -22,7 +22,7 @@ export default function Dashboard({ title }: Page) {
       {role === "patient" && <div>Patient Dashboard</div>}
       {role === "doctor" && <div>Doctor Dashboard</div>}
       {role === "admin" && <div>Admin Dashboard</div>}
-      {!role && <div>Super User Dashboard</div>}
+      {role === "super" && <div>Super Dashboard</div>}
     </div>
   )
 }

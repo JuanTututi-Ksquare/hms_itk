@@ -11,7 +11,7 @@ function Layout() {
   const showNav = useAppSelector(selectNavStatus);
   const isLoggedIn = useAppSelector(selectLoginStatus)
   const userInfo = useAppSelector(selectLogin);
-  const role = userInfo.role;
+  const role = userInfo.role ? userInfo.role : "super";
 
   return (
     <div className={styles["layout"]}>
