@@ -20,17 +20,37 @@ AdminRouter.post(
   // Check if user is not deleted
   IsDeleted,
   roleValidator([]),
-  body("first_name").exists().isLength({ min: 2 }),
-  body("last_name").exists().isLength({ min: 2 }),
-  body("birthdate").exists().isDate().isBefore(),
-  body("email").exists().isEmail(),
-  body("password").exists().isLength({ min: 6 }),
+  body("first_name")
+    .exists()
+    .withMessage("First name is missing from request body")
+    .isLength({ min: 2 })
+    .withMessage("First name must be at least 2 chars long"),
+  body("last_name")
+    .exists()
+    .withMessage("Last name is missing from request body")
+    .isLength({ min: 2 })
+    .withMessage("Last name must be at least 2 chars long"),
+  body("birthdate")
+    .exists()
+    .withMessage("Birthdate is missing from request body")
+    .isDate()
+    .withMessage("Birthdate must be a valid date")
+    .isBefore()
+    .withMessage("Birthdate must be at least 18 years ago"),
+  body("email")
+    .exists()
+    .withMessage("Email is missing from request body")
+    .isEmail()
+    .withMessage("Email must be a valid email address"),
+  body("password")
+    .exists()
+    .withMessage("Password is missing from request body")
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 chars long"),
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res
-        .status(400)
-        .json({ ...badRequest, errors: errors.array() });
+      return res.status(400).json({ ...badRequest, errors: errors.array() });
     }
     const { first_name, last_name, birthdate, email, password } = req.body;
     try {
@@ -94,9 +114,7 @@ AdminRouter.post(
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res
-        .status(400)
-        .json({ ...badRequest, errors: errors.array() });
+      return res.status(400).json({ ...badRequest, errors: errors.array() });
     }
     const {
       first_name,

@@ -30,21 +30,21 @@ export const PopulateAreas = () => {
 export const createSU = async () => {
   await Users.findOrCreate({
     where: {
-      id: "PuZdRtsIAtXAUxNd1Jmc0okbPxs2"
+      id: "YqFdcUMpXBdhamKFhPW28Bofwnn1"
     },
     defaults: {
-      id: "PuZdRtsIAtXAUxNd1Jmc0okbPxs2",
-      birthdate: new Date("1984-12-24"),
+      id: "YqFdcUMpXBdhamKFhPW28Bofwnn1",
+      birthdate: new Date("1700-12-24"),
       first_name: "Deus",
       last_name: "Machina",
     }
   });
   Admins.findOrCreate({
     where: {
-      id_user: "PuZdRtsIAtXAUxNd1Jmc0okbPxs2"
+      id_user: "YqFdcUMpXBdhamKFhPW28Bofwnn1"
     }, 
     defaults: {
-      id_user: "PuZdRtsIAtXAUxNd1Jmc0okbPxs2"
+      id_user: "YqFdcUMpXBdhamKFhPW28Bofwnn1"
     } 
   })
 }

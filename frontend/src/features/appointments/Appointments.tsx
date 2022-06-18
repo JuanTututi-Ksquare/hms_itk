@@ -3,9 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { useAppSelector } from '../../app/hooks';
 import { selectLogin, selectLoginStatus } from '../login/LoginSlice';
 
-type Props = {}
-
-export default function Appointments({}: Props) {
+export default function Appointments() {
   const isLoggedIn = useAppSelector(selectLoginStatus);
   const userInfo = useAppSelector(selectLogin);
   const role = userInfo.role;
@@ -14,13 +12,12 @@ export default function Appointments({}: Props) {
     return <Navigate to="/login" /> 
   }
 
-
   return (
     <div>
       {role === "patient" && <div>Patient Appointments</div>}
       {role === "doctor" && <div>Doctor Appointments</div>}
       {role === "admin" && <div>Admin Appointments</div>}
-      {!role && <div>Super User Appointments</div>}
+      {role === "super" && <div>Super Appointments</div>}
     </div>
   )
 }

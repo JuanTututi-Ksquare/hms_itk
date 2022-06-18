@@ -57,7 +57,10 @@ button:active {
 }
 
 .missing-field {
-  color: rgb(255, 0, 0);
+  position: absolute;
+  margin-top: 5px;
+  color: red;
+  font-size: 14px;
 }
 
 a {

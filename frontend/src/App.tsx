@@ -8,6 +8,8 @@ import Dashboard from "./features/dashboard/Dashboard"
 import Appointments from "./features/appointments/Appointments"
 import Appointment from "./features/appointment/Appointment"
 import NewAppointment from "./features/create-appointment/NewAppointment"
+import Users from "./features/users/Users"
+import NewDoctor from "./features/new-doctor/NewDoctor"
 
 export default function App() {
   return (
@@ -21,6 +23,8 @@ export default function App() {
         <Route path="appointments" element={<Appointments />} />
         <Route path="appointments/:id" element={<Appointment />}/>
         <Route path="appointments/new" element={<NewAppointment />} />
+        <Route path="users" element={<Users />} />
+        <Route path="users/new-doctor" element={<NewDoctor title={"Arkham Hospital - New Doctor"} />} />
         <Route path="*" element={<NotFound title="Arkham Hospital - Page not found"/>} />
       </Route>
     </Routes>
