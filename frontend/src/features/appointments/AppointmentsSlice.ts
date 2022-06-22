@@ -146,6 +146,60 @@ export const getAppointmentsByPatient = createAsyncThunk(
   }
 );
 
+export const getDoctorOrderPatient = createAsyncThunk(
+  "appointments/doctor-patient",
+  async (info: { token: string; order: string }) => {
+    const response = await fetch(
+      `http://localhost:3001/doctor/appointments?` +
+        new URLSearchParams({ order: `patient+${info.order}` }),
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${info.token}`,
+        },
+      }
+    );
+    const data = await response.json();
+    return data;
+  }
+);
+
+export const getDoctorOrderDate = createAsyncThunk(
+  "appointments/doctor-date",
+  async (info: { token: string; order: string }) => {
+    const response = await fetch(
+      `http://localhost:3001/doctor/appointments?` +
+        new URLSearchParams({ order: `date+${info.order}` }),
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${info.token}`,
+        },
+      }
+    );
+    const data = await response.json();
+    return data;
+  }
+);
+
+export const getDoctorFilterDate = createAsyncThunk(
+  "appointments/doctor-filter-date",
+  async (info: { token: string; date: string }) => {
+    const response = await fetch(
+      `http://localhost:3001/doctor/appointments?` +
+        new URLSearchParams({ date: `${info.date}+ASC` }),
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${info.token}`,
+        },
+      }
+    );
+    const data = await response.json();
+    return data;
+  }
+);
+
 export const AppointmentsSlice = createSlice({
   name: "appointments",
   initialState,
@@ -230,6 +284,45 @@ export const AppointmentsSlice = createSlice({
     });
 
     builder.addCase(getAppointmentsByPatient.fulfilled, (state, action) => {
+      state.status = "completed";
+      state.appointments = action.payload;
+    });
+
+    builder.addCase(getDoctorOrderPatient.pending, (state) => {
+      state.status = "loading";
+    });
+
+    builder.addCase(getDoctorOrderPatient.rejected, (state) => {
+      state.status = "failed";
+    });
+
+    builder.addCase(getDoctorOrderPatient.fulfilled, (state, action) => {
+      state.status = "completed";
+      state.appointments = action.payload;
+    });
+
+    builder.addCase(getDoctorOrderDate.pending, (state) => {
+      state.status = "loading";
+    });
+
+    builder.addCase(getDoctorOrderDate.rejected, (state) => {
+      state.status = "failed";
+    });
+
+    builder.addCase(getDoctorOrderDate.fulfilled, (state, action) => {
+      state.status = "completed";
+      state.appointments = action.payload;
+    });
+
+    builder.addCase(getDoctorFilterDate.pending, (state) => {
+      state.status = "loading";
+    });
+
+    builder.addCase(getDoctorFilterDate.rejected, (state) => {
+      state.status = "failed";
+    });
+
+    builder.addCase(getDoctorFilterDate.fulfilled, (state, action) => {
       state.status = "completed";
       state.appointments = action.payload;
     });

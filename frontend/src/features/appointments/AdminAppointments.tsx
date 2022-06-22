@@ -107,8 +107,8 @@ function AdminAppointments() {
   const filterPatient = () => {
     if (searchByPatient) {
       const id = searchByPatient;
-      setSearchByPatient("");
       dispatch(getAppointmentsByPatient({ role, token, id }));
+      setSearchByPatient("");
     } else {
       dispatch(getAppointments({ token, role }));
     }
