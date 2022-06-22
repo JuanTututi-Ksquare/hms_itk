@@ -1,24 +1,24 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import * as admin from "firebase-admin";
 
 export const checkAuth = async (
   req: Request,
   res: Response,
-  next: Function
+  next: NextFunction
 ) => {
   const { authorization } = req.headers;
 
   if (authorization === undefined) {
     res.statusCode = 401;
     return res.send({
-      error: "Authentication error",
+      error: "Authentication error - header not defined",
     });
   }
 
   if (!authorization.startsWith("Bearer")) {
     res.statusCode = 401;
     return res.send({
-      error: "Authentication error",
+      error: "Authentication error - Bearer missing",
     });
   }
 
@@ -27,7 +27,7 @@ export const checkAuth = async (
   if (splittedToken.length !== 2) {
     res.statusCode = 401;
     return res.send({
-      error: "Authentication error",
+      error: "Authentication error - token missing",
     });
   }
 

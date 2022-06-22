@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
-import { body, param, validationResult } from "express-validator";
+import { body, query, param, validationResult } from "express-validator";
+import { badRequest, internalServerError } from "../config/CustomRespones";
 import { Pagination } from "../config/CustomTypes";
 import { CreateAppointment } from "../handlers/CreateAppointment.handler";
 import { CreatePatient } from "../handlers/CreatePatient.handler";
@@ -8,6 +9,7 @@ import {
   getPatientAppointments,
   getSinglePatientAppointment,
 } from "../handlers/GetAppointments.handler";
+import { GetDoctorOptions } from "../handlers/GetDoctorOptions";
 import { checkPatientAssociation } from "../middlewares/Association.validator";
 import { checkAuth } from "../middlewares/Auth.validator";
 import {
@@ -24,38 +26,63 @@ export const PatientRouter = Router();
 PatientRouter.post(
   "/",
   //   First and last name must be at least 2 chars long
-  body("first_name").exists().isLength({ min: 2 }),
-  body("last_name").exists().isLength({ min: 2 }),
+  body("first_name")
+    .exists()
+    .withMessage("First name is missing")
+    .isLength({ min: 2 })
+    .withMessage("First name must be at least 2 chars long"),
+  body("last_name")
+    .exists()
+    .withMessage("Last name is missing")
+    .isLength({ min: 2 })
+    .withMessage("Last name must be at least 2 chars long"),
   //   Birthdate must be before current date
-  body("birthdate").exists().isDate().isBefore(),
+  body("birthdate")
+    .exists()
+    .withMessage("Birthdate is missing")
+    .isDate()
+    .withMessage("Birthdate must be a valid date")
+    .isBefore()
+    .withMessage("Birthdate must be a past date"),
   //   Email has to be on correct format
-  body("email").exists().isEmail(),
+  body("email")
+    .exists()
+    .withMessage("Email is missing")
+    .isEmail()
+    .withMessage("Email is not valid"),
   //   Password must be at least 6 chars
-  body("password").exists().isLength({ min: 6 }),
-  body("curp").exists().isString().isLength({ min: 18, max: 18 }),
-  body("role").exists().isString().matches("patient"),
+  body("password")
+    .exists()
+    .withMessage("Password is missing")
+    .isLength({ min: 8 })
+    .withMessage("Password must be a least 8 chars long"),
+  body("curp")
+    .exists()
+    .withMessage("CURP is missing")
+    .isString()
+    .withMessage("CURP must be a string")
+    .isLength({ min: 18, max: 18 })
+    .withMessage("CURP must be 18 chars long"),
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      // return res.status(422).json({ errors: errors.array() });
-      res
-        .status(400)
-        .send({ error: "Invalid request!" });
+      return res.status(400).json({ ...badRequest, errors: errors.array() });
     }
-    const { first_name, last_name, birthdate, email, password, curp, role } =
+    const { first_name, last_name, birthdate, email, password, curp } =
       req.body;
     try {
-      res.send(await CreatePatient(
-        first_name,
-        last_name,
-        birthdate,
-        email,
-        password,
-        curp,
-        role
-      ));
+      return res.json(
+        await CreatePatient(
+          first_name,
+          last_name,
+          birthdate,
+          email,
+          password,
+          curp
+        )
+      );
     } catch (error) {
-      res.status(500).send({ error: "Something went wrong" });
+      return res.status(500).json(internalServerError);
     }
   }
 );
@@ -67,8 +94,17 @@ PatientRouter.post(
   // Check if user is not deleted
   IsDeleted,
   roleValidator(["patient"]),
-  body("id_doctor").exists().isInt(),
-  body("date").exists().toDate().isAfter(),
+  body("id_doctor")
+    .exists()
+    .withMessage("Doctor ID is missing from request body")
+    .isInt()
+    .withMessage("Doctor ID must be an integer"),
+  body("date")
+    .exists()
+    .withMessage("Date is missing from request body")
+    .toDate()
+    .isAfter()
+    .withMessage("Date is not valid"),
   // Check if the patient exists
   checkExistingPatient,
   // Check if the doctor exists
@@ -78,19 +114,32 @@ PatientRouter.post(
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res
-        .status(400)
-        .send({ error: "Input error: Please verify the payload!" });
+      return res.status(400).json({ ...badRequest, errors: errors.array() });
     }
     const { id_doctor, date } = req.body;
     const { id_patient } = res.locals;
     try {
       const appointment = await CreateAppointment(id_doctor, id_patient, date);
-      res.status(201).send(appointment);
+      return res.status(201).json(appointment);
     } catch (error) {
-      res
-        .status(500)
-        .send({ error: "Internal server error, please try again later!" });
+      return res.status(500).json(internalServerError);
+    }
+  }
+);
+
+// Get Doctor Options
+PatientRouter.get(
+  "/doctors",
+  checkAuth,
+  IsDeleted,
+  roleValidator(["patient"]),
+  checkExistingPatient,
+  async (req:Request, res: Response) => {
+    try {
+      const doctors = await GetDoctorOptions();
+      return res.status(200).json(doctors);
+    } catch (error) {
+      return res.status(500).json(internalServerError);
     }
   }
 );
@@ -103,35 +152,35 @@ PatientRouter.get(
   IsDeleted,
   roleValidator(["patient"]),
   checkExistingPatient,
+  query("page")
+    .isNumeric()
+    .withMessage("Page param must be an integer")
+    .optional(),
+  query("limit")
+    .isNumeric()
+    .withMessage("Limit param must be an integer")
+    .optional(),
   async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ ...badRequest, errors: errors.array() });
+    }
     const { uid } = res.locals;
-    const pagination: Pagination = {page: 1, limit: 10};
+    const pagination: Pagination = { page: 1, limit: 10 };
 
-    if (req.query.page && typeof req.query.page === "string") {
-      const page = +req.query.page;
-      if (!Number.isNaN(page)) {
-        pagination["page"] = page;
-      } else {
-        res.status(400).send({ error: "Invalid request!" });
-      }
+    if (req.query.page) {
+      pagination["page"] = +req.query.page;
     }
 
-    if (req.query.limit && typeof req.query.limit === "string") {
-      const limit = +req.query.limit;
-      if (!Number.isNaN(limit)) {
-        pagination["limit"] = limit;
-      } else {
-        res.status(400).send({ error: "Invalid request!" });
-      }
+    if (req.query.limit) {
+      pagination["limit"] = +req.query.limit;
     }
-    
+
     try {
       const appointments = await getPatientAppointments(uid, pagination);
-      res.status(200).send(appointments);
+      return res.status(200).json(appointments);
     } catch (error) {
-      res
-        .status(500)
-        .send({ error: "Internal server error, please try again later!" });
+      return res.status(500).json(internalServerError);
     }
   }
 );
@@ -143,23 +192,19 @@ PatientRouter.get(
   // Check if user is not deleted
   IsDeleted,
   roleValidator(["patient"]),
-  param("id").exists().isNumeric(),
+  query("id").exists().isNumeric(),
   checkPatientAssociation,
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res
-        .status(400)
-        .send({ error: "Input error: Please verify the payload!" });
+      return res.status(400).json({ ...badRequest, errors: errors.array() });
     }
     const { id } = req.params;
     try {
       const appointment = await getSinglePatientAppointment(+id);
-      res.status(200).send(appointment);
+      return res.status(200).json(appointment);
     } catch (error) {
-      res
-        .status(500)
-        .send({ error: "Internal server error, please try again later!" });
+      return res.status(500).json(internalServerError);
     }
   }
 );
@@ -174,12 +219,18 @@ PatientRouter.delete(
   param("id").exists().isNumeric(),
   checkPatientAssociation,
   async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ ...badRequest, errors: errors.array() });
+    }
     const { id } = req.params;
     try {
-      const appointment = await deletePatientAppointment(+id);
-      res.status(200).send({sucess: "Appointment deleted successfully!"});
+      await deletePatientAppointment(+id);
+      return res
+        .status(200)
+        .json({ sucess: "Appointment deleted successfully!" });
     } catch (error) {
-      res.status(500).send({error: "Internal server error, please try again later!"})
+      return res.status(500).json(internalServerError);
     }
   }
 );

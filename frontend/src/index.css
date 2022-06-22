@@ -1,3 +1,10 @@
+/* Color Palette */
+
+/* Primary: #36d8ab
+   Secondary: #2d74df
+   Background: #ffffff
+*/
+
 * {
   margin: 0;
   padding: 0;
@@ -5,43 +12,81 @@
 }
 
 body {
+  background-color: white;
   font-family: 'oxygen', sans-serif;
   font-weight: 400;
   font-size: 16px;
   line-height: 1.7;
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+label {
+  display: flex;
+  flex-direction: column;
+  margin-left: 5px;
+}
+
 input {
+  font-family: "oxygen", sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   padding: 10px 10px;
   background-color: transparent;
   border-top: 0;
-  border-right: 0;
   border-left: 0;
-  border-bottom: 2px solid black;
+  border-right: 0;
+  border-bottom: 2.5px solid rgb(95, 95, 95);
+  outline: none;
+  transition: all 0.5s;
 }
 
 input:focus {
-  outline: none;
-  border-bottom: 2px solid palevioletred;
+  border-bottom: 2.5px solid #36d8ab;
 }
 
-.submit-button {
-  border: 0px;
-  font-size: 18px;
-  letter-spacing: 1px;
-  color: white;
-  background-color: #9e52d1;
-  box-shadow: 0px 10px 15px rgba(180, 36, 209, 0.2);
-  width: 100%;
-  align-items: center;
-  margin-top: 15px;
-  padding: 20px 0;
-  border-radius: 5px;
-}
-
-.submit-button:hover {
-  border: 0px;
+button:hover {
   cursor: pointer;
+}
+
+button:active {
+  transform: translateY(3px);
+}
+
+select {
+  width: 100%;
+  font-family: "oxygen", sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  text-transform: capitalize;
+  padding: 10px 10px;
+  background-color: transparent;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 2.5px solid rgb(95, 95, 95);
+  outline: none;
+  transition: all 0.5s;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+select:focus {
+  border-bottom: 2.5px solid #36d8ab;
+}
+
+.missing-field {
+  position: absolute;
+  margin-top: 5px;
+  color: red;
+  font-size: 14px;
+}
+
+a {
+  font-weight: 600;
+  color: #36d8ab;
+  text-decoration: none;
 }

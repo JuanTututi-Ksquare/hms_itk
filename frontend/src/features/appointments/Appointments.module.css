@@ -1,0 +1,109 @@
+.appointment {
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+  margin: 20px;
+  padding: 30px;
+  border: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.199);
+  border-radius: 30px;
+}
+
+.appointment > div {
+  flex: 1;
+  padding: 10px;
+  margin: auto;
+}
+
+.status > img {
+  max-width: 40px;
+}
+
+.delete {
+  border: 0;
+  border-radius: 10px;
+  background-color: white;
+  padding: 10px 20px;
+  transition: all .5s;
+}
+
+.delete:hover {
+  color: white;
+  background-color: #36d8ab;
+}
+
+.delete:focus {
+  border: 0;
+}
+
+.delete > img {
+  max-width: 40px;
+}
+
+.delete > p{
+  font-family: "oxygen", sans-serif;
+  font-size: 13px;
+}
+
+.filters {
+  display: flex;
+  flex-direction: row;
+}
+
+.filters > div {
+  flex: 1;
+  margin: 10px 10px;
+}
+
+.filter-values {
+  display: flex;
+  flex-direction: row;
+}
+
+.filter-values > div {
+  flex: 1;
+  margin: 10px 10px;
+}
+
+.filter-values button {
+  margin: 0 10px;
+  padding: 10px 15px;
+  border: 0;
+  color: white;
+  background-color: #2d74df;
+  font-family: "oxygen", sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+}
+
+.appointments-placeholder > h2 {
+  text-align: center;
+  margin: 50px 0;
+}
+
+@media only screen and (max-width: 630px) {
+  .filters {
+    flex-direction: column;
+  }
+  .filters > div {
+    flex: 0;
+    margin: 10px 10px;
+  }
+  .filter-values {
+    flex-direction: column;
+  }
+  .filter-values > div {
+    flex: 0;
+    margin: 10px 10px;
+  }
+
+  .appointment {
+    flex-direction: column;
+  }
+  .appointment > div {
+    flex: 0;
+    padding: 10px;
+    margin: auto;
+  }
+}

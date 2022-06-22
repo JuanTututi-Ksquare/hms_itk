@@ -1,0 +1,31 @@
+.delete-form {
+    margin: auto;
+    text-align: center;
+}
+
+.delete-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.delete-form > button{
+    border: 0px;
+    font-size: 18px;
+    letter-spacing: 1px;
+    color: black;
+    background-color: white;
+    box-shadow: 0px 10px 15px rgba(75, 80, 85, 0.2);
+    width: 100%;
+    align-items: center;
+    margin-top: 15px;
+    padding: 20px 0;
+    border-radius: 5px;
+    transition: all 0.5s;
+}
+
+.delete-form > button:hover {
+    border: 0px;
+    cursor: pointer;
+    color: white;
+    background-color: #e24a77;
+}
