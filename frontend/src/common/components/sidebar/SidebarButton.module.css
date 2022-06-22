@@ -45,9 +45,11 @@
 }
 
 .menu-button > button:hover{
-    background-color: rgba(0, 0, 0, 0.164);
+    color: white;
+    background-color: #36d8ab;
 }
 
 .menu-button > a > button:hover{
-    background-color: rgba(0, 0, 0, 0.164);
+    color: white;
+    background-color: #36d8ab;
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
 import { selectLogin, selectLoginStatus } from "../login/LoginSlice";
@@ -7,10 +7,17 @@ import AdminAppointments from "./AdminAppointments";
 import PatientAppointments from "./PatientAppointments";
 import DoctorAppointments from "./DoctorAppointments";
 
-export default function Appointments() {
+type Props = {
+  title: string;
+};
+
+export default function Appointments({ title }: Props) {
   const isLoggedIn = useAppSelector(selectLoginStatus);
   const userInfo = useAppSelector(selectLogin);
   const role = userInfo.role;
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
 
   if (!isLoggedIn) {
     return <Navigate to="/login" />;

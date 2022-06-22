@@ -31,6 +31,10 @@
   background-color: #21ebb2;
 }
 
+.submit-button:focus {
+  border: 0;
+}
+
 .server-error {
   margin-top: 30px;
   color: red;

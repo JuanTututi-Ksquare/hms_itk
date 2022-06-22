@@ -4,20 +4,22 @@
 }
 
 .main-content {
-  min-height: 94vh;
+  min-height: 90vh;
   display: flex;
   flex-direction: row;
 }
 
 .main {
   flex: 1;
-  min-height: 94vh;
+  min-height: 90vh;
   display: flex;
   flex-direction: column;
+  overflow: auto;
 }
 
 .sidebar {
   flex: 0.2;
+  min-height: 93vh;
   z-index: 1;
   background-color: #ffffff;
   display: flex;

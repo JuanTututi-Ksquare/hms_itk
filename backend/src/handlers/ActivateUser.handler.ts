@@ -1,6 +1,7 @@
+import * as firebaseAdmin from "firebase-admin";
 import { Users } from "../models/Users.model";
 
-export const ActivateUser = async (id_user: number) => {
+export const ActivateUser = async (id_user: string) => {
   try {
     const activatedUser = await Users.update(
       {
@@ -13,7 +14,10 @@ export const ActivateUser = async (id_user: number) => {
       }
     );
     if (activatedUser) {
-      return { success: "User activated successfully", };
+      await firebaseAdmin.auth().updateUser(id_user, {
+        disabled: false,
+      });
+      return { success: "User activated successfully", id: id_user};
     }
   } catch (error) {
     return error;

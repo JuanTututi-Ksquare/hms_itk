@@ -156,10 +156,10 @@ AdminRouter.patch(
   async (req: Request, res: Response) => {
     const { id_user } = req.body;
     try {
-      await ActivateUser(id_user);
-      res.status(200).send({ success: "User activated successfully!" });
+      const user = await ActivateUser(id_user);
+      return res.status(200).send(user);
     } catch (error) {
-      res.status(500).send(internalServerError);
+      return res.status(500).send(error);
     }
   }
 );
@@ -279,7 +279,7 @@ AdminRouter.get(
   roleValidator(["admin"]),
   async (req: Request, res: Response) => {
     let filters: UserFilters = {};
-    let pagination: { page: number; limit: number } = { page: 1, limit: 10 };
+    let pagination: { page: number; limit: number } = { page: 1, limit: 20 };
     if (req.query.is_deleted && typeof req.query.is_deleted === "string") {
       let is_deleted = false;
       if (req.query.status === "true") {

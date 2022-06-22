@@ -37,7 +37,7 @@
   background-color: #5e9eff;
 }
 
-.submit:active {
+.submit:focus {
   border: 0;
 }
 

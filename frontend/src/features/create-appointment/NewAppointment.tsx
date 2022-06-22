@@ -39,7 +39,7 @@ const NewAppointment = ({title}: Props) => {
           type="success"
           title="Appointment has been scheduled!"
           message={`Appointment for ${dateSuccess} has been registered`}
-          redirect="/login"
+          redirect="/appointments"
         />
       )}
       <NewAppointmentForm onSuccess={appointmentSuccess} />

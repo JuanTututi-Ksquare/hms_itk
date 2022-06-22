@@ -23,7 +23,7 @@ export default function SignUp({ title }: Page) {
   const isLoggedIn = useAppSelector(selectLoginStatus);
 
   if(isLoggedIn) {
-    return <Navigate to="/dashboard" replace={true} />
+    return <Navigate to="/" replace={true} />
   }
 
   return (

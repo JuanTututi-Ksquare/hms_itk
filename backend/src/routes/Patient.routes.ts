@@ -82,7 +82,6 @@ PatientRouter.post(
         )
       );
     } catch (error) {
-      
       return res.status(500).json(internalServerError);
     }
   }

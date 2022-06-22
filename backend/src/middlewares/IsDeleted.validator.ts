@@ -17,6 +17,6 @@ export const IsDeleted = async (req: Request, res: Response, next: NextFunction)
             return next();
         }
     } catch (error) {
-        return res.status(500).json(internalServerError);
+        return res.status(500).send("Error al comprobar existencia!");
     }
 }

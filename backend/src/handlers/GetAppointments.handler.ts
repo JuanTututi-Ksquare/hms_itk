@@ -189,7 +189,6 @@ export const getPatientAppointments = async (
     const list = await Appointments.findAll({
       where: {
         id_patient: patient.id,
-        status: true,
       },
       offset,
       limit,

@@ -1,10 +1,5 @@
 export const patientOptions = [
   {
-    image: "home",
-    text: "Dasboard",
-    url: "/dashboard",
-  },
-  {
     image: "add",
     text: "New Appointment",
     url: "/appointments/new",
@@ -28,11 +23,6 @@ export const patientOptions = [
 
 export const doctorOptions = [
   {
-    image: "home",
-    text: "Dasboard",
-    url: "/dashboard",
-  },
-  {
     image: "copy",
     text: "Appointments",
     url: "/appointments/",
@@ -50,11 +40,6 @@ export const doctorOptions = [
 ];
 
 export const superOptions = [
-  {
-    image: "home",
-    text: "Dashboard",
-    url: "/dashboard",
-  },
   {
     image: "stamped",
     text: "Add Doctor",
@@ -79,11 +64,6 @@ export const superOptions = [
 
 
 export const adminOptions = [
-  {
-    image: "home",
-    text: "Dashboard",
-    url: "/dashboard",
-  },
   {
     image: "stamped",
     text: "Add Doctor",

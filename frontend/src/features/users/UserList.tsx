@@ -1,10 +1,14 @@
 import React, { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { selectLogin } from "../login/LoginSlice";
-import { getUsers, selectStatus, selectUsers } from "./UsersSlice";
+import { clearUsers, getUsers, selectStatus, selectUsers } from "./UsersSlice";
 import styles from "./Users.module.css";
 
-function UserList() {
+type Props = {
+  onSuccess: Function;
+};
+
+function UserList({ onSuccess }: Props) {
   const dispatch = useAppDispatch();
   const reqStatus = useAppSelector(selectStatus);
   const token = useAppSelector(selectLogin).token;
@@ -16,6 +20,28 @@ function UserList() {
   });
 
   const users = useAppSelector(selectUsers);
+
+  const activateUser = async (event: any) => {
+    const id_user = event.target.value;
+    fetch("http://localhost:3001/admin/users", {
+      method: "PATCH",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        id_user
+      }),
+    }).then((response) => {
+      response.json().then((data) => {
+        dispatch(clearUsers);
+        onSuccess(data.id);
+      });
+    }).catch((error) => {
+      console.log(error);
+    });
+  };
 
   const userList = users.map((user) => {
     const userName = `${user.first_name} ${user.last_name}`;
@@ -36,8 +62,10 @@ function UserList() {
           <h4>{status}</h4>
         </div>
         {status === "Deleted" && (
-          <div>
-            <button>Activate User</button>
+          <div className={styles["activate-user"]}>
+            <button value={user.id} onClick={activateUser}>
+              Activate User
+            </button>
           </div>
         )}
       </div>

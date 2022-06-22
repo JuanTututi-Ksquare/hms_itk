@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { selectLogin } from "../login/LoginSlice";
 import {
+  clearAppointments,
   getAppointments,
   selectAppointments,
   selectStatus,
@@ -22,6 +23,20 @@ function PatientAppointments() {
   });
 
   const appointments = useAppSelector(selectAppointments);
+
+  const deleteAppointment = (event: any) => {
+    const id = event.target.value;
+    fetch("http://localhost:3001/patient/appointments/" + id, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }).then((response) => {
+      response.json().then((data) => {
+        dispatch(clearAppointments());
+      });
+    });
+  };
 
   const appointmentsList = appointments.map((appointment) => {
     const date = moment(appointment.date).format("LLLL");
@@ -57,6 +72,18 @@ function PatientAppointments() {
           <div className={styles["status"]}>
             <img src="/images/completed.png" alt="completed" />
             <h4>Completed</h4>
+          </div>
+        )}
+        {!["Cancelled", "Completed"].includes(appointmentStatus) && (
+          <div>
+            <button
+              value={appointment.id}
+              className={styles["delete"]}
+              onClick={deleteAppointment}
+            >
+              <img src="/images/delete.png" alt="delete" />
+              <p>Cancel appointment</p>
+            </button>
           </div>
         )}
       </div>

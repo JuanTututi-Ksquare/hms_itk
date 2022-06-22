@@ -46,13 +46,15 @@
     letter-spacing: 1px;
     text-transform: uppercase;
     color: white;
+    box-shadow: 0px 1.5px 2px rgba(0, 0, 0, 0.2);
     font-weight: 400;
     font-size: 16px;
     transition: all 0.5s;
 }
 
 .header-button > button:hover {
-    background-color: #21ebb2;
+    color: white;
+    background-color: #36e7b5;
 }
 
 @keyframes moveInLeft{

@@ -1,26 +1,51 @@
-import React from 'react'
-import { Navigate } from 'react-router-dom';
-import { useAppSelector } from '../../app/hooks'
-import { selectLogin, selectLoginStatus } from '../login/LoginSlice'
-import UserList from './UserList';
-import styles from "./Users.module.css"
+import React, { useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
+import { useAppSelector } from "../../app/hooks";
+import Modal from "../../common/components/modal/Modal";
+import { selectLogin, selectLoginStatus } from "../login/LoginSlice";
+import UserList from "./UserList";
+import styles from "./Users.module.css";
 
-function Users() {
+type Props = {
+  title: string;
+};
+
+function Users({ title }: Props) {
   const isLoggedIn = useAppSelector(selectLoginStatus);
   let role = useAppSelector(selectLogin).role;
-  if(role === "super") {
-    role="admin";
+  const [success, setSucess] = useState(false);
+  const [uidSuccess, setUidSuccess] = useState("");
+
+  const activateSuccess = (uid: string) => {
+    setSucess(true);
+    setUidSuccess(uid)
+  };
+  
+  if (role === "super") {
+    role = "admin";
   }
 
-  if(!isLoggedIn && role !== "admin"){
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
+
+  if (!isLoggedIn && role !== "admin") {
     return <Navigate to="/" replace={true} />;
   }
 
   return (
     <div className={styles["users"]}>
-    <UserList />
+      {success && (
+        <Modal
+          type="success"
+          title="User activation successfull"
+          message={`${uidSuccess} is now active`}
+          redirect="/"
+        />
+      )}
+      <UserList onSuccess={activateSuccess}/>
     </div>
-  )
+  );
 }
 
-export default Users
+export default Users;

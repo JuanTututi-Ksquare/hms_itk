@@ -14,7 +14,7 @@ export default function Login({ title }: Page) {
   const isLoggedIn = useAppSelector(selectLoginStatus);
 
   if (isLoggedIn) {
-    return <Navigate to="/dashboard" replace={true} />
+    return <Navigate to="/appointments" replace={true} />
   }
 
   return (

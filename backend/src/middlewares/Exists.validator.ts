@@ -137,7 +137,7 @@ export const checkInactiveUser = async (
       return res.status(404).json({ error: `User is active or not existing` });
     }
   } catch (error) {
-    return res.status(500).json(internalServerError);
+    return res.status(500).send("Error al comprobar del usuario a activar!");
   }
 };
 
