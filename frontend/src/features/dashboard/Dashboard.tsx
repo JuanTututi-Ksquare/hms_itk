@@ -19,8 +19,8 @@ export default function Dashboard({ title }: Page) {
   
   return (
     <div>
-      {role === "patient" && <div>Patient Dashboard</div>}
-      {role === "doctor" && <div>Doctor Dashboard</div>}
+      {role === "patient" && <div>Pending Dates</div>}
+      {role === "doctor" && <div>Pending Dates</div>}
       {role === "admin" && <div>Admin Dashboard</div>}
       {role === "super" && <div>Super Dashboard</div>}
     </div>

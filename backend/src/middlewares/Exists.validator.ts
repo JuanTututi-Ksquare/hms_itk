@@ -42,35 +42,47 @@ export const checkExistingDoctor = async (
 ) => {
   let doctor: Doctors | Users | null;
   try {
-    if (req.body.id_doctor) {
-      const user = await Users.findOne({
+    if ("id_doctor" in req.body) {
+      const doctorInfo = await Doctors.findOne({
         where: {
           id: req.body.id_doctor,
+          availability: true,
+        },
+      });
+      if (doctorInfo) {
+        const userInfo = await Users.findOne({
+          where: {
+            id: doctorInfo.id_user,
+            is_deleted: false,
+          },
+        });
+        if (userInfo) {
+          res.locals = { ...res.locals, id_doctor: doctorInfo.id };
+          return next();
+        }
+      } else {
+        return res.status(500).json(internalServerError);
+      }
+    } else {
+      const user = await Users.findOne({
+        where: {
+          id: res.locals.uid,
           is_deleted: false,
         },
       });
       if (user) {
         doctor = await Doctors.findOne({
           where: {
-            id: req.body.id_doctor,
+            id_user: user.id,
             availability: true,
           },
         });
         if (doctor) {
           res.locals = { ...res.locals, id_doctor: doctor.id };
+          return next();
         } else {
-          return res.status(400).json({ error: `Doctor doesn't exists or is currently unavaliable!` });
+          return res.status(500).json(internalServerError);
         }
-      }
-    } else {
-      doctor = await Users.findOne({
-        where: {
-          id: res.locals.uid,
-          is_deleted: false,
-        },
-      });
-      if (doctor) {
-        return next();
       } else {
         return res.status(501).json(unauthorized);
       }
@@ -85,9 +97,13 @@ export const checkExistingAppointment = async (
   res: Response,
   next: NextFunction
 ) => {
+  const { id_doctor } = req.body;
+  const { id_patient } = res.locals;
   try {
     const appointment = await Appointments.findOne({
       where: {
+        id_doctor,
+        id_patient,
         date: req.body.date,
         status: true,
       },
@@ -98,9 +114,7 @@ export const checkExistingAppointment = async (
       return next();
     }
   } catch (error) {
-    return res
-      .status(500)
-      .json(internalServerError);
+    return res.status(500).json(internalServerError);
   }
 };
 
@@ -123,9 +137,7 @@ export const checkInactiveUser = async (
       return res.status(404).json({ error: `User is active or not existing` });
     }
   } catch (error) {
-    return res
-      .status(500)
-      .json(internalServerError);
+    return res.status(500).json(internalServerError);
   }
 };
 
@@ -148,8 +160,6 @@ export const checkExistingUser = async (
       res.status(404).json({ error: `User is not active or not existing!` });
     }
   } catch (error) {
-    return res
-      .status(500)
-      .json(internalServerError);
+    return res.status(500).json(internalServerError);
   }
 };

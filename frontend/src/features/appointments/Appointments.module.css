@@ -1,0 +1,88 @@
+.appointments {
+  width: 90%;
+  margin: 30px auto;
+}
+
+.appointment {
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+  margin: 20px;
+  padding: 30px;
+  border: 0;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.39);
+  border-radius: 10px;
+}
+
+.appointment > div {
+  flex: 1;
+  padding: 10px;
+  margin: auto;
+}
+
+.status > img {
+  max-width: 40px;
+}
+
+.filters {
+  display: flex;
+  flex-direction: row;
+}
+
+.filters > div {
+  flex: 1;
+  margin: 10px 10px;
+}
+
+.filter-values {
+  display: flex;
+  flex-direction: row;
+}
+
+.filter-values > div {
+  flex: 1;
+  margin: 10px 10px;
+}
+
+.filter-values button {
+  margin: 0 10px;
+  padding: 10px 15px;
+  border: 0;
+  color: white;
+  background-color: #2d74df;
+  font-family: "oxygen", sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+}
+
+
+.appointments-placeholder > h2{
+  text-align: center;
+  margin: 50px 0;
+}
+
+@media only screen and (max-width: 630px) {
+  .filters {
+    flex-direction: column;
+  }
+  .filters > div {
+    flex: 0;
+    margin: 10px 10px;
+  }
+  .filter-values {
+    flex-direction: column;
+  }
+  .filter-values > div {
+    flex: 0;
+    margin: 10px 10px;
+  }
+
+  .appointment {
+    flex-direction: column;
+  }
+  .appointment > div {
+    flex: 0;
+    padding: 10px;
+    margin: auto;
+  }
+}

@@ -26,7 +26,7 @@ app.use(express.json());
 app.use("/patient", PatientRouter);
 app.use("/admin", AdminRouter);
 app.use("/doctor", DoctorsRouter);
-app.use("/disable", AuthRouter);
+app.use("/auth", AuthRouter);
 app.use("/contact", ContactRouter);
 
 try {

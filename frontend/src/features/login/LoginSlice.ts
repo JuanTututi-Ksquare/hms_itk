@@ -53,7 +53,19 @@ export const loginWithFirebase = createAsyncThunk(
 export const LoginSlice = createSlice({
   name: "login",
   initialState,
-  reducers: {},
+  reducers: {
+    logOut: (state) => {
+      state.loggedIn = false;
+      state.loginInfo = {
+        id: "",
+        displayName: "",
+        email: "",
+        token: "",
+        role: "",
+      };
+      state.status = "idle";
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(loginWithFirebase.pending, (state) => {
       state.status = "loading";
@@ -77,6 +89,8 @@ export const LoginSlice = createSlice({
     });
   },
 });
+
+export const { logOut } = LoginSlice.actions;
 
 export const selectRequestStatus = (state: RootState) => state.login.status;
 export const selectLoginStatus = (state: RootState) => state.login.loggedIn;

@@ -22,7 +22,7 @@ export default function App() {
         <Route path="dashboard" element={<Dashboard title="Arkham Hospital - Dashboard" />} />
         <Route path="appointments" element={<Appointments />} />
         <Route path="appointments/:id" element={<Appointment />}/>
-        <Route path="appointments/new" element={<NewAppointment />} />
+        <Route path="appointments/new" element={<NewAppointment title="Arkham Hospital - New Appointment"/>} />
         <Route path="users" element={<Users />} />
         <Route path="users/new-doctor" element={<NewDoctor title={"Arkham Hospital - New Doctor"} />} />
         <Route path="*" element={<NotFound title="Arkham Hospital - Page not found"/>} />

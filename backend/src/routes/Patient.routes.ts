@@ -9,6 +9,7 @@ import {
   getPatientAppointments,
   getSinglePatientAppointment,
 } from "../handlers/GetAppointments.handler";
+import { GetDoctorOptions } from "../handlers/GetDoctorOptions";
 import { checkPatientAssociation } from "../middlewares/Association.validator";
 import { checkAuth } from "../middlewares/Auth.validator";
 import {
@@ -65,9 +66,7 @@ PatientRouter.post(
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res
-        .status(400)
-        .json({ ...badRequest, errors: errors.array() });
+      return res.status(400).json({ ...badRequest, errors: errors.array() });
     }
     const { first_name, last_name, birthdate, email, password, curp } =
       req.body;
@@ -83,6 +82,7 @@ PatientRouter.post(
         )
       );
     } catch (error) {
+      
       return res.status(500).json(internalServerError);
     }
   }
@@ -115,9 +115,7 @@ PatientRouter.post(
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res
-        .status(400)
-        .json({ ...badRequest, errors: errors.array() });
+      return res.status(400).json({ ...badRequest, errors: errors.array() });
     }
     const { id_doctor, date } = req.body;
     const { id_patient } = res.locals;
@@ -125,9 +123,24 @@ PatientRouter.post(
       const appointment = await CreateAppointment(id_doctor, id_patient, date);
       return res.status(201).json(appointment);
     } catch (error) {
-      return res
-        .status(500)
-        .json(internalServerError);
+      return res.status(500).json(internalServerError);
+    }
+  }
+);
+
+// Get Doctor Options
+PatientRouter.get(
+  "/doctors",
+  checkAuth,
+  IsDeleted,
+  roleValidator(["patient"]),
+  checkExistingPatient,
+  async (req:Request, res: Response) => {
+    try {
+      const doctors = await GetDoctorOptions();
+      return res.status(200).json(doctors);
+    } catch (error) {
+      return res.status(500).json(internalServerError);
     }
   }
 );
@@ -140,14 +153,18 @@ PatientRouter.get(
   IsDeleted,
   roleValidator(["patient"]),
   checkExistingPatient,
-  query("page").isNumeric().withMessage("Page param must be an integer").optional(),
-  query("limit").isNumeric().withMessage("Limit param must be an integer").optional(),
+  query("page")
+    .isNumeric()
+    .withMessage("Page param must be an integer")
+    .optional(),
+  query("limit")
+    .isNumeric()
+    .withMessage("Limit param must be an integer")
+    .optional(),
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res
-        .status(400)
-        .json({ ...badRequest, errors: errors.array() });
+      return res.status(400).json({ ...badRequest, errors: errors.array() });
     }
     const { uid } = res.locals;
     const pagination: Pagination = { page: 1, limit: 10 };
@@ -164,9 +181,7 @@ PatientRouter.get(
       const appointments = await getPatientAppointments(uid, pagination);
       return res.status(200).json(appointments);
     } catch (error) {
-      return res
-        .status(500)
-        .json(internalServerError);
+      return res.status(500).json(internalServerError);
     }
   }
 );
@@ -183,18 +198,14 @@ PatientRouter.get(
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res
-        .status(400)
-        .json({ ...badRequest, errors: errors.array() });
+      return res.status(400).json({ ...badRequest, errors: errors.array() });
     }
     const { id } = req.params;
     try {
       const appointment = await getSinglePatientAppointment(+id);
       return res.status(200).json(appointment);
     } catch (error) {
-      return res
-        .status(500)
-        .json(internalServerError);
+      return res.status(500).json(internalServerError);
     }
   }
 );
@@ -211,9 +222,7 @@ PatientRouter.delete(
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res
-        .status(400)
-        .json({ ...badRequest, errors: errors.array() });
+      return res.status(400).json({ ...badRequest, errors: errors.array() });
     }
     const { id } = req.params;
     try {
@@ -222,9 +231,7 @@ PatientRouter.delete(
         .status(200)
         .json({ sucess: "Appointment deleted successfully!" });
     } catch (error) {
-      return res
-        .status(500)
-        .json(internalServerError);
+      return res.status(500).json(internalServerError);
     }
   }
 );

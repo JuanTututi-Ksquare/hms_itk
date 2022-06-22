@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
 import Modal from "../../common/components/modal/Modal";
-import { selectLoginStatus } from "../login/LoginSlice";
+import { selectLogin, selectLoginStatus } from "../login/LoginSlice";
 import styles from "./NewDoctor.module.css"
 import NewDoctorForm from "./NewDoctorForm";
 
@@ -24,9 +24,14 @@ function NewDoctor({ title }: Props) {
   });
 
   const isLoggedIn = useAppSelector(selectLoginStatus);
+  let role = useAppSelector(selectLogin).role;
+  
+  if(role === "super"){
+    role = "admin"
+  }
 
-  if (!isLoggedIn) {
-    return <Navigate to="/dashboard" replace={true} />;
+  if (!isLoggedIn && role !== "admin") {
+    return <Navigate to="/" replace={true} />;
   }
 
   return (

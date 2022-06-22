@@ -1,11 +1,9 @@
 import { Op, OrderItem } from "sequelize";
-import {
-  AdminFilters,
-  DoctorFilters,
-  Pagination,
-} from "../config/CustomTypes";
+import { AdminFilters, DoctorFilters, Pagination } from "../config/CustomTypes";
 import { Appointments } from "../models/Appointments.model";
+import { Doctors } from "../models/Doctors.model";
 import { Patients } from "../models/Patients.model";
+import { Users } from "../models/Users.model";
 
 // Admin
 // Get all appointments
@@ -17,8 +15,8 @@ export const getAllAppointments = async (
   const limit = pagination["limit"];
   const offset = (pageNumber - 1) * limit;
 
-  if (filters && !filters["orderByPatient"] && !filters["orderByDoctor"] ) {
-    console.log(filters);
+  if (filters && !filters["orderByPatient"] && !filters["orderByDoctor"]) {
+    let result = [];
     try {
       const appointments = await Appointments.findAll({
         where: {
@@ -26,46 +24,159 @@ export const getAllAppointments = async (
         },
         offset,
         limit,
+        order: [["date", "DESC"]]
       });
-      return appointments;
+      if (appointments) {
+        for (const appointment of appointments) {
+          const doctor = await Doctors.findOne({
+            where: {
+              id: appointment.id_doctor,
+            },
+          });
+          const patient = await Patients.findOne({
+            where: {
+              id: appointment.id_patient,
+            },
+          });
+          if (doctor && patient) {
+            const doctorUser = await Users.findOne({
+              where: {
+                id: doctor.id_user,
+              },
+            });
+            const patientUser = await Users.findOne({
+              where: {
+                id: patient.id_user,
+              },
+            });
+            if(doctorUser && patientUser){
+              const {id, date, id_patient, id_doctor, status} = appointment;
+              const patientName = `${patientUser.first_name} ${patientUser.last_name}`;
+              const doctorName = `${doctorUser.first_name} ${doctorUser.last_name}`
+              result.push({id, date, id_patient, id_doctor, patientName, doctorName, status});
+            }
+          } else {
+            throw new Error("Internal Server Error");
+          }
+        }
+      }
+      return result;
     } catch (error) {
       return error;
     }
   }
 
-  if (filters && (Object.keys(filters).includes("orderByPatient") || Object.keys(filters).includes("orderByDoctor"))) {
+  if (
+    filters &&
+    (Object.keys(filters).includes("orderByPatient") ||
+      Object.keys(filters).includes("orderByDoctor"))
+  ) {
     const order = Object.keys(filters).includes("orderByPatient")
       ? (["id_patient", filters["orderByPatient"]] as OrderItem)
       : (["id_doctor", filters["orderByDoctor"]] as OrderItem);
     try {
+      let result = [];
       const appointments = await Appointments.findAll({
         offset,
         limit,
-        order: [order]
+        order: [order],
       });
-      return appointments;
+      if (appointments) {
+        for (const appointment of appointments) {
+          const doctor = await Doctors.findOne({
+            where: {
+              id: appointment.id_doctor,
+            },
+          });
+          const patient = await Patients.findOne({
+            where: {
+              id: appointment.id_patient,
+            },
+          });
+          if (doctor && patient) {
+            const doctorUser = await Users.findOne({
+              where: {
+                id: doctor.id_user,
+              },
+            });
+            const patientUser = await Users.findOne({
+              where: {
+                id: patient.id_user,
+              },
+            });
+            if(doctorUser && patientUser){
+              const {id, date, id_patient, id_doctor, status} = appointment;
+              const patientName = `${patientUser.first_name} ${patientUser.last_name}`;
+              const doctorName = `${doctorUser.first_name} ${doctorUser.last_name}`
+              result.push({id, date, id_patient, id_doctor, patientName, doctorName, status});
+            }
+          } else {
+            throw new Error("Internal Server Error");
+          }
+        }
+      }
+      return result;
     } catch (error) {
       return error;
     }
-  } 
+  }
 
   try {
-    console.log("sin filters")
+    let result = [];
     const appointments = await Appointments.findAll({
       offset,
       limit,
+      order: [["date", "DESC"]]
     });
-    return appointments;
+    if (appointments) {
+      for (const appointment of appointments) {
+        const doctor = await Doctors.findOne({
+          where: {
+            id: appointment.id_doctor,
+          },
+        });
+        const patient = await Patients.findOne({
+          where: {
+            id: appointment.id_patient,
+          },
+        });
+        if (doctor && patient) {
+          const doctorUser = await Users.findOne({
+            where: {
+              id: doctor.id_user,
+            },
+          });
+          const patientUser = await Users.findOne({
+            where: {
+              id: patient.id_user,
+            },
+          });
+          if(doctorUser && patientUser){
+            const {id, date, id_patient, id_doctor, status} = appointment;
+            const patientName = `${patientUser.first_name} ${patientUser.last_name}`;
+            const doctorName = `${doctorUser.first_name} ${doctorUser.last_name}`
+            result.push({id, date, id_patient, id_doctor, patientName, doctorName, status});
+          }
+        } else {
+          throw new Error("Internal Server Error");
+        }
+      }
+    }
+    return result;
   } catch (error) {
     return error;
   }
 };
 
 // Patient
-export const getPatientAppointments = async (uid: number, pagination: Pagination) => {
+export const getPatientAppointments = async (
+  uid: number,
+  pagination: Pagination
+) => {
   const page = pagination["page"];
   const limit = pagination["limit"];
   const offset = (page - 1) * limit;
+  let result = [];
   try {
     const patient = await Patients.findOne({
       where: {
@@ -82,8 +193,43 @@ export const getPatientAppointments = async (uid: number, pagination: Pagination
       },
       offset,
       limit,
+      order: [["date", "DESC"]]
     });
-    return list;
+    if (list) {
+      for (const appointment of list) {
+        const doctor = await Doctors.findOne({
+          where: {
+            id: appointment.id_doctor,
+          },
+        });
+        const patient = await Patients.findOne({
+          where: {
+            id: appointment.id_patient,
+          },
+        });
+        if (doctor && patient) {
+          const doctorUser = await Users.findOne({
+            where: {
+              id: doctor.id_user,
+            },
+          });
+          const patientUser = await Users.findOne({
+            where: {
+              id: patient.id_user,
+            },
+          });
+          if(doctorUser && patientUser){
+            const {id, date, id_patient, id_doctor, status} = appointment;
+            const patientName = `${patientUser.first_name} ${patientUser.last_name}`;
+            const doctorName = `${doctorUser.first_name} ${doctorUser.last_name}`
+            result.push({id, date, id_patient, id_doctor, patientName, doctorName, status});
+          }
+        } else {
+          throw new Error("Internal Server Error");
+        }
+      }
+    }
+    return result;
   } catch (error) {
     return error;
   }
@@ -131,18 +277,52 @@ export const getDoctorAppointments = async (
     order.push(["date", finalDateOrder] as OrderItem);
 
     try {
+      let result = [];
       const appointments = await Appointments.findAll({
         where: {
           ...otherFilters,
           id_doctor,
           date: { [Op.between]: [initialDate, endDate] },
-          status: true,
         },
         offset,
         limit,
         order: [...order],
       });
-      return appointments;
+      if (appointments) {
+        for (const appointment of appointments) {
+          const doctor = await Doctors.findOne({
+            where: {
+              id: appointment.id_doctor,
+            },
+          });
+          const patient = await Patients.findOne({
+            where: {
+              id: appointment.id_patient,
+            },
+          });
+          if (doctor && patient) {
+            const doctorUser = await Users.findOne({
+              where: {
+                id: doctor.id_user,
+              },
+            });
+            const patientUser = await Users.findOne({
+              where: {
+                id: patient.id_user,
+              },
+            });
+            if(doctorUser && patientUser){
+              const {id, date, id_patient, id_doctor, status} = appointment;
+              const patientName = `${patientUser.first_name} ${patientUser.last_name}`;
+              const doctorName = `${doctorUser.first_name} ${doctorUser.last_name}`
+              result.push({id, date, id_patient, id_doctor, patientName, doctorName, status});
+            }
+          } else {
+            throw new Error("Internal Server Error");
+          }
+        }
+      }
+      return result;
     } catch (error) {
       return error;
     }
@@ -156,6 +336,7 @@ export const getDoctorAppointments = async (
     !Object.keys(filters).includes("date")
   ) {
     try {
+      let result = [];
       const appointments = await Appointments.findAll({
         where: {
           ...filters,
@@ -165,7 +346,41 @@ export const getDoctorAppointments = async (
         offset,
         limit,
       });
-      return appointments;
+      if (appointments) {
+        for (const appointment of appointments) {
+          const doctor = await Doctors.findOne({
+            where: {
+              id: appointment.id_doctor,
+            },
+          });
+          const patient = await Patients.findOne({
+            where: {
+              id: appointment.id_patient,
+            },
+          });
+          if (doctor && patient) {
+            const doctorUser = await Users.findOne({
+              where: {
+                id: doctor.id_user,
+              },
+            });
+            const patientUser = await Users.findOne({
+              where: {
+                id: patient.id_user,
+              },
+            });
+            if(doctorUser && patientUser){
+              const {id, date, id_patient, id_doctor, status} = appointment;
+              const patientName = `${patientUser.first_name} ${patientUser.last_name}`;
+              const doctorName = `${doctorUser.first_name} ${doctorUser.last_name}`
+              result.push({id, date, id_patient, id_doctor, patientName, doctorName, status});
+            }
+          } else {
+            throw new Error("Internal Server Error");
+          }
+        }
+      }
+      return result;
     } catch (error) {
       return error;
     }
@@ -180,6 +395,7 @@ export const getDoctorAppointments = async (
       ? (["id_patient", filters["orderByPatient"]] as OrderItem)
       : (["date", filters["orderByDate"]] as OrderItem);
     try {
+      let result = [];
       const appointments = await Appointments.findAll({
         where: {
           id_doctor,
@@ -189,13 +405,48 @@ export const getDoctorAppointments = async (
         limit,
         order: [order],
       });
-      return appointments;
+      if (appointments) {
+        for (const appointment of appointments) {
+          const doctor = await Doctors.findOne({
+            where: {
+              id: appointment.id_doctor,
+            },
+          });
+          const patient = await Patients.findOne({
+            where: {
+              id: appointment.id_patient,
+            },
+          });
+          if (doctor && patient) {
+            const doctorUser = await Users.findOne({
+              where: {
+                id: doctor.id_user,
+              },
+            });
+            const patientUser = await Users.findOne({
+              where: {
+                id: patient.id_user,
+              },
+            });
+            if(doctorUser && patientUser){
+              const {id, date, id_patient, id_doctor, status} = appointment;
+              const patientName = `${patientUser.first_name} ${patientUser.last_name}`;
+              const doctorName = `${doctorUser.first_name} ${doctorUser.last_name}`
+              result.push({id, date, id_patient, id_doctor, patientName, doctorName, status});
+            }
+          } else {
+            throw new Error("Internal Server Error");
+          }
+        }
+      }
+      return result;
     } catch (error) {
       return error;
     }
   }
 
   try {
+    let result = [];
     const appointments = await Appointments.findAll({
       where: {
         id_doctor,
@@ -203,8 +454,43 @@ export const getDoctorAppointments = async (
       },
       offset,
       limit,
+      order: [["date", "DESC"]]
     });
-    return appointments;
+    if (appointments) {
+      for (const appointment of appointments) {
+        const doctor = await Doctors.findOne({
+          where: {
+            id: appointment.id_doctor,
+          },
+        });
+        const patient = await Patients.findOne({
+          where: {
+            id: appointment.id_patient,
+          },
+        });
+        if (doctor && patient) {
+          const doctorUser = await Users.findOne({
+            where: {
+              id: doctor.id_user,
+            },
+          });
+          const patientUser = await Users.findOne({
+            where: {
+              id: patient.id_user,
+            },
+          });
+          if(doctorUser && patientUser){
+            const {id, date, id_patient, id_doctor, status} = appointment;
+            const patientName = `${patientUser.first_name} ${patientUser.last_name}`;
+            const doctorName = `${doctorUser.first_name} ${doctorUser.last_name}`
+            result.push({id, date, id_patient, id_doctor, patientName, doctorName, status});
+          }
+        } else {
+          throw new Error("Internal Server Error");
+        }
+      }
+    }
+    return result;
   } catch (error) {
     return error;
   }

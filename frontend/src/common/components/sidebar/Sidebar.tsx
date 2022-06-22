@@ -1,7 +1,6 @@
 import React from "react";
-import PatientOptions from "./PatientOptions";
+import Options from "./Options";
 import styles from "./Sidebar.module.css";
-import SuperOptions from "./SuperOptions";
 
 type Props = {
   className: string;
@@ -12,8 +11,10 @@ export default function Sidebar({ className, layout }: Props) {
   return (
     <div className={`${className}`}>
       <div className={styles["menu"]}>
-        {layout === "patient" && <PatientOptions />}
-        {layout === "super" && <SuperOptions />}
+        {layout === "patient" && <Options layout="patient"/>}
+        {layout === "super" && <Options layout="super"/>}
+        {layout === "admin" && <Options layout="admin"/>}
+        {layout === "doctor" && <Options layout="doctor"/>}
       </div>
     </div>
   );

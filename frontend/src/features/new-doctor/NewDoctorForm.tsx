@@ -195,10 +195,10 @@ function NewDoctorForm({ onSuccess }: Props) {
           </div>
           <div>
             <label htmlFor="area">Area</label>
-            <select  id="area" {...register("area", {
+            <select defaultValue={'DEFAULT'}   id="area" {...register("area", {
                 required: "Area is missing",
               })}>
-                <option value="" selected disabled>Select area</option>
+                <option value="DEFAULT" disabled>Select area</option>
                 <option value="1">Dermatology</option>
                 <option value="2">Internal Medicine</option>
                 <option value="3">Familiar Medicine</option>

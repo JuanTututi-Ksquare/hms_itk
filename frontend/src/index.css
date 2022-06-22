@@ -56,6 +56,28 @@ button:active {
   transform: translateY(3px);
 }
 
+select {
+  width: 100%;
+  font-family: "oxygen", sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  text-transform: capitalize;
+  padding: 10px 10px;
+  background-color: transparent;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 2.5px solid rgb(95, 95, 95);
+  outline: none;
+  transition: all 0.5s;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+select:focus {
+  border-bottom: 2.5px solid #36d8ab;
+}
+
 .missing-field {
   position: absolute;
   margin-top: 5px;

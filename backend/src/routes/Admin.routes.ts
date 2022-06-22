@@ -1,10 +1,11 @@
-import { Router, Request, Response, query } from "express";
-import { body, validationResult } from "express-validator";
+import { Router, Request, Response } from "express";
+import { body, query, validationResult } from "express-validator";
 import { badRequest, internalServerError } from "../config/CustomRespones";
-import { AdminFilters } from "../config/CustomTypes";
+import { AdminFilters, UserFilters } from "../config/CustomTypes";
 import { ActivateUser } from "../handlers/ActivateUser.handler";
 import { CreateAdmin } from "../handlers/CreateAdmin.handler";
 import { CreateDoctor } from "../handlers/CreateDoctor.handler";
+import { GetAllUsers } from "../handlers/GetAllUsers.handler";
 import { getAllAppointments } from "../handlers/GetAppointments.handler";
 import { checkAuth } from "../middlewares/Auth.validator";
 import { checkInactiveUser } from "../middlewares/Exists.validator";
@@ -179,7 +180,7 @@ AdminRouter.get(
       if (!Number.isNaN(parseInt(id_patient, 10))) {
         filters = { ...filters, id_patient: +id_patient };
       } else {
-        res.status(400).send({ ...badRequest, error: "Invalid url query!" });
+        res.status(400).send({ ...badRequest, error: "Invalid url query - patient search!" });
       }
     }
 
@@ -189,7 +190,7 @@ AdminRouter.get(
       if (!Number.isNaN(parseInt(id_doctor, 10))) {
         filters = { ...filters, id_doctor: +id_doctor };
       } else {
-        res.status(400).send({ ...badRequest, error: "Invalid url query!" });
+        res.status(400).send({ ...badRequest, error: "Invalid url query - doctor search!" });
       }
     }
 
@@ -203,7 +204,7 @@ AdminRouter.get(
         status = false;
         filters = { ...filters, status };
       } else {
-        res.status(400).send({ ...badRequest, error: "Invalid url query!" });
+        res.status(400).send({ ...badRequest, error: "Invalid url query - status order!" });
       }
     }
 
@@ -261,11 +262,41 @@ AdminRouter.get(
           const appointments = await getAllAppointments(pagination);
           res.status(200).send(appointments);
         } else {
-          res.status(400).send({ ...badRequest, error: "Invalid url query!" });
+          res.status(400).send({ ...badRequest, error: "Invalid url query - no queries!" });
         }
       }
     } catch (error) {
       res.status(500).send(internalServerError);
+    }
+  }
+);
+
+AdminRouter.get(
+  "/users",
+  checkAuth,
+  // Check if user is not deleted
+  IsDeleted,
+  roleValidator(["admin"]),
+  async (req: Request, res: Response) => {
+    let filters: UserFilters = {};
+    let pagination: { page: number; limit: number } = { page: 1, limit: 10 };
+    if (req.query.is_deleted && typeof req.query.is_deleted === "string") {
+      let is_deleted = false;
+      if (req.query.status === "true") {
+        is_deleted = true;
+        filters = { ...filters, is_deleted };
+      } else if (req.query.status === "false") {
+        is_deleted = false;
+        filters = { ...filters, is_deleted };
+      } else {
+        return res.status(400).send({ ...badRequest, error: "Invalid url query!" });
+      }
+    }
+    try {
+      const users = await GetAllUsers(filters, pagination);
+      return res.status(200).json(users);  
+    } catch (error) {
+      return res.status(500).send(internalServerError);
     }
   }
 );

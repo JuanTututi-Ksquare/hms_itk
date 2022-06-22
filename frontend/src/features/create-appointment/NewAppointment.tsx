@@ -1,20 +1,49 @@
-import React from 'react'
+import moment from 'moment';
+import React, { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom';
 import { useAppSelector } from '../../app/hooks';
+import Modal from '../../common/components/modal/Modal';
 import { selectLogin, selectLoginStatus } from '../login/LoginSlice';
+import styles from "./NewAppointment.module.css"
+import NewAppointmentForm from './NewAppointmentForm';
 
-type Props = {}
+type Props = {
+  title: string
+}
 
-const NewAppointment = (props: Props) => {
+const NewAppointment = ({title}: Props) => {
+  const [success, setSucess] = useState(false);
+  const [dateSuccess, setDateSuccess] = useState("");
   const isLoggedIn = useAppSelector(selectLoginStatus);
   const role = useAppSelector(selectLogin).role;
+
+  const appointmentSuccess = (date: string) => {
+    setSucess(true);
+    const dateFormatted = moment(date).format("LLLL");
+    setDateSuccess(dateFormatted)
+  };
+
+  useEffect(() => {
+    document.title = title;
+  });
+  
   
   if(!isLoggedIn || role !== "patient") {
-    return <Navigate to="/login" /> 
+    return <Navigate to="/" /> 
   }
 
   return (
-    <div>NewAppointment</div>
+    <div className={styles["new"]}>
+      {success && (
+        <Modal
+          type="success"
+          title="Appointment has been scheduled!"
+          message={`Appointment for ${dateSuccess} has been registered`}
+          redirect="/login"
+        />
+      )}
+      <NewAppointmentForm onSuccess={appointmentSuccess} />
+    </div>
   )
 }
 

@@ -12,11 +12,11 @@ export const IsDeleted = async (req: Request, res: Response, next: NextFunction)
             }
         })
         if (user) {
-            res.status(404).json({error: "User doesn't exists!"});
+            return res.status(404).json({error: "User doesn't exists!"});
         } else {
             return next();
         }
     } catch (error) {
-        res.status(500).json(internalServerError);
+        return res.status(500).json(internalServerError);
     }
 }
