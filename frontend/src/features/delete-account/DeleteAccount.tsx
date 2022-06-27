@@ -40,7 +40,7 @@ function DeleteAccount({ title }: Props) {
 
   return (
     <div className={styles["delete-form"]}>
-      <h2>Warning</h2>
+      <h2>Warning!</h2>
       <h4>Are you sure you want to delete your account?</h4>
       <button onClick={deleteAccount}>Delete Account</button>
     </div>

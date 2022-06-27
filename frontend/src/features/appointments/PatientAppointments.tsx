@@ -22,7 +22,30 @@ function PatientAppointments() {
     }
   });
 
-  const appointments = useAppSelector(selectAppointments);
+  const appointments = useAppSelector(selectAppointments).appointments;
+  const count = useAppSelector(selectAppointments).count;
+
+  const pageSelectors = (count: number) => {
+    const pages = Math.ceil(count / 5);
+    const selectors = [];
+    // En caso de no haber filtros
+    if (pages < 1) {
+      return <button>1</button>;
+    }
+    for (let index = 1; index <= pages; index++) {
+      selectors.push(
+        <button key={index} value={index} onClick={getAppointmentsPage}>
+          {index}
+        </button>
+      );
+    }
+    return selectors;
+  };
+
+  const getAppointmentsPage = (event: any) => {
+    const page = event.target.value;
+    dispatch(getAppointments({ role, token, page }));
+  };
 
   const deleteAppointment = (event: any) => {
     const id = event.target.value;
@@ -78,7 +101,7 @@ function PatientAppointments() {
           <div>
             <button
               value={appointment.id}
-              className={styles["delete"]}
+              className={styles["action-button"]}
               onClick={deleteAppointment}
             >
               <img src="/images/delete.png" alt="delete" />
@@ -93,7 +116,10 @@ function PatientAppointments() {
   return (
     <>
       {appointmentsList.length ? (
-        appointmentsList
+        <div>
+          {appointmentsList}
+          <div className={styles["pagination"]}>{pageSelectors(count)}</div>
+        </div>
       ) : (
         <div className={styles["appointments-placeholder"]}>
           <h2>No results were found!</h2>

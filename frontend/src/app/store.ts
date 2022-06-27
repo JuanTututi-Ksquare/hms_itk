@@ -3,12 +3,14 @@ import loginReducer from "../features/login/LoginSlice"
 import navReducer from '../common/components/navbar/NavBarSlice';
 import appointmentsReducer from '../features/appointments/AppointmentsSlice';
 import usersReducer from '../features/users/UsersSlice';
+import messagesReducer from "../features/messages/MessagesSlice"
 export const store = configureStore({
   reducer: {
     login: loginReducer,
     nav: navReducer,
     appointments: appointmentsReducer,
     users: usersReducer,
+    messages: messagesReducer,
   },
 });
 

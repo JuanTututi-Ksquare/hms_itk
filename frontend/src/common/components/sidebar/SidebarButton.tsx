@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAppDispatch } from "../../../app/hooks";
 import { clearAppointments } from "../../../features/appointments/AppointmentsSlice";
 import { logOut } from "../../../features/login/LoginSlice";
+import { clearMessages } from "../../../features/messages/MessagesSlice";
 import { clearUsers } from "../../../features/users/UsersSlice";
 import styles from "./SidebarButton.module.css";
 
@@ -23,6 +24,7 @@ function SidebarButton({ image, text, url }: Props) {
             url === "/" && dispatch(logOut());
             dispatch(clearAppointments());
             dispatch(clearUsers());
+            dispatch(clearMessages());
           }}
         >
           <img src={`/images/${image}.png`} alt={`${image}`} />

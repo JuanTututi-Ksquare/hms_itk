@@ -15,11 +15,33 @@ function UserList({ onSuccess }: Props) {
 
   useEffect(() => {
     if (reqStatus === "idle") {
-      dispatch(getUsers(token));
+      dispatch(getUsers({ token }));
     }
   });
 
-  const users = useAppSelector(selectUsers);
+  const users = useAppSelector(selectUsers).users;
+  const count = useAppSelector(selectUsers).count;
+
+  const pageSelectors = (count: number) => {
+    const pages = Math.ceil(count / 5);
+    const selectors = [];
+    if (pages < 1) {
+      return <button>1</button>;
+    }
+    for (let index = 1; index <= pages; index++) {
+      selectors.push(
+        <button key={index} value={index} onClick={getUsersPage}>
+          {index}
+        </button>
+      );
+    }
+    return selectors;
+  };
+
+  const getUsersPage = (event: any) => {
+    const page = event.target.value;
+    dispatch(getUsers({ token, page }));
+  };
 
   const activateUser = async (event: any) => {
     const id_user = event.target.value;
@@ -31,16 +53,18 @@ function UserList({ onSuccess }: Props) {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        id_user
+        id_user,
       }),
-    }).then((response) => {
-      response.json().then((data) => {
-        dispatch(clearUsers);
-        onSuccess(data.id);
+    })
+      .then((response) => {
+        response.json().then((data) => {
+          dispatch(clearUsers);
+          onSuccess(data.id);
+        });
+      })
+      .catch((error) => {
+        console.log(error);
       });
-    }).catch((error) => {
-      console.log(error);
-    });
   };
 
   const userList = users.map((user) => {
@@ -71,7 +95,12 @@ function UserList({ onSuccess }: Props) {
       </div>
     );
   });
-  return <div>{userList}</div>;
+  return (
+    <div>
+      {userList}
+      <div className={styles["pagination"]}>{pageSelectors(count)}</div>
+    </div>
+  );
 }
 
 export default UserList;

@@ -1,5 +1,10 @@
 export const patientOptions = [
   {
+    image: "home",
+    text: "Home",
+    url: "/home",
+  },
+  {
     image: "add",
     text: "New Appointment",
     url: "/appointments/new",
@@ -12,7 +17,7 @@ export const patientOptions = [
   {
     image: "delete-account",
     text: "Delete my account",
-    url: "/delete"
+    url: "/delete-account",
   },
   {
     image: "log-out",
@@ -23,6 +28,11 @@ export const patientOptions = [
 
 export const doctorOptions = [
   {
+    image: "home",
+    text: "Home",
+    url: "/home",
+  },
+  {
     image: "copy",
     text: "Appointments",
     url: "/appointments/",
@@ -30,7 +40,7 @@ export const doctorOptions = [
   {
     image: "delete-account",
     text: "Delete my account",
-    url: "/delete"
+    url: "/delete-account",
   },
   {
     image: "log-out",
@@ -41,6 +51,11 @@ export const doctorOptions = [
 
 export const superOptions = [
   {
+    image: "home",
+    text: "Home",
+    url: "/home",
+  },
+  {
     image: "stamped",
     text: "Add Doctor",
     url: "/users/new-doctor",
@@ -54,6 +69,11 @@ export const superOptions = [
     image: "users",
     text: "Users",
     url: "/users",
+  },
+  {
+    image: "messages",
+    text: "Messages",
+    url: "/messages"
   },
   {
     image: "log-out",
@@ -62,8 +82,12 @@ export const superOptions = [
   },
 ];
 
-
 export const adminOptions = [
+  {
+    image: "home",
+    text: "Home",
+    url: "/home",
+  },
   {
     image: "stamped",
     text: "Add Doctor",
@@ -80,13 +104,18 @@ export const adminOptions = [
     url: "/users",
   },
   {
+    image: "messages",
+    text: "Messages",
+    url: "/messages"
+  },
+  {
     image: "delete-account",
     text: "Delete my account",
-    url: "/delete"
+    url: "/delete-account",
   },
   {
     image: "log-out",
     text: "Log out",
-    url: "/",
+    url: "/home",
   },
 ];

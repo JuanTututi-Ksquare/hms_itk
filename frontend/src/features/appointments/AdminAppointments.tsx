@@ -29,16 +29,123 @@ function AdminAppointments() {
     }
   }, [reqStatus, dispatch, token, role]);
 
-  const appointments = useAppSelector(selectAppointments);
+  const appointments = useAppSelector(selectAppointments).appointments;
+  const count = useAppSelector(selectAppointments).count;
+  const filters = useAppSelector(selectAppointments).filters;
+
+  // Function to generate page selectors
+  const pageSelectors = (count: number) => {
+    const pages = Math.ceil(count / 5);
+    const selectors = [];
+
+    if (filters) {
+      if (Object.keys(filters).includes("id_patient")) {
+        for (let index = 1; index <= pages; index++) {
+          selectors.push(
+            <button
+              key={index}
+              value={index}
+              onClick={() => {
+                filterPatient(index);
+              }}
+            >
+              {index}
+            </button>
+          );
+        }
+        return selectors;
+      }
+
+      if (Object.keys(filters).includes("id_doctor")) {
+        for (let index = 1; index <= pages; index++) {
+          selectors.push(
+            <button
+              key={index}
+              value={index}
+              onClick={() => filterDoctor(index)}
+            >
+              {index}
+            </button>
+          );
+        }
+        return selectors;
+      }
+
+      if (Object.keys(filters).includes("status")) {
+        for (let index = 1; index <= pages; index++) {
+          selectors.push(
+            <button
+              key={index}
+              value={index}
+              onClick={() => filterStatus(`${filters.status}`, index)}
+            >
+              {index}
+            </button>
+          );
+        }
+        return selectors;
+      }
+
+      if (Object.keys(filters).includes("orderByPatient")) {
+        for (let index = 1; index <= pages; index++) {
+          selectors.push(
+            <button
+              key={index}
+              value={index}
+              onClick={() => orderByPatient(`${filters.orderByPatient}`, index)}
+            >
+              {index}
+            </button>
+          );
+        }
+        return selectors;
+      }
+
+      if (Object.keys(filters).includes("orderByDoctor")) {
+        for (let index = 1; index <= pages; index++) {
+          selectors.push(
+            <button
+              key={index}
+              value={index}
+              onClick={() => orderByDoctor(`${filters.orderByDoctor}`, index)}
+            >
+              {index}
+            </button>
+          );
+        }
+        return selectors;
+      }
+    } else {
+      // En caso de no haber filtros
+      if (pages < 1) {
+        return <button>1</button>;
+      }
+      for (let index = 1; index <= pages; index++) {
+        selectors.push(
+          <button key={index} value={index} onClick={getAppointmentsPage}>
+            {index}
+          </button>
+        );
+      }
+      return selectors;
+    }
+  };
+
+  const getAppointmentsPage = (event: any) => {
+    const page = event.target.value;
+    dispatch(getAppointments({ role, token, page }));
+  };
 
   const appointmentsList = appointments.map((appointment) => {
     const date = moment(appointment.date).format("LLLL");
     let appointmentStatus = appointment.status ? "Pending" : "Cancelled";
     const today = new Date();
     const appointmentDate = new Date(appointment.date);
-    if (appointmentDate < today) {
+
+    if (appointmentDate < today && appointmentStatus === "Pending") {
       appointmentStatus = "Completed";
     }
+
     return (
       <div key={appointment.id} className={styles["appointment"]}>
         <div>
@@ -46,8 +153,16 @@ function AdminAppointments() {
           <h4>{appointment.doctorName}</h4>
         </div>
         <div>
+          <p>Doctor ID</p>
+          <h4>{appointment.id_doctor}</h4>
+        </div>
+        <div>
           <p>Patient</p>
           <h4>{appointment.patientName}</h4>
+        </div>
+        <div>
+          <p>Patient ID</p>
+          <h4>{appointment.id_patient}</h4>
         </div>
         <div>
           <p>Date</p>
@@ -75,40 +190,57 @@ function AdminAppointments() {
     );
   });
 
-  const orderByPatient = (event: any) => {
-    const order = event.target.value;
-    dispatch(getAppointmentsOrderPatient({ role, token, order }));
-  };
-
-  const orderByDoctor = (event: any) => {
-    const order = event.target.value;
-    dispatch(getAppointmentsOrderDoctor({ role, token, order }));
-  };
-
-  const filterStatus = (event: any) => {
-    const status = event.target.value;
-    if (status === "none") {
-      dispatch(getAppointments({ token, role }));
+  const orderByPatient = (value: string, page?: number) => {
+    if (page) {
+      dispatch(
+        getAppointmentsOrderPatient({ role, token, order: value, page })
+      );
     } else {
-      dispatch(getAppointmentsByStatus({ role, token, status }));
+      dispatch(getAppointmentsOrderPatient({ role, token, order: value }));
     }
   };
 
-  const filterDoctor = () => {
+  const orderByDoctor = (value: string, page?: number) => {
+    if (page) {
+      dispatch(getAppointmentsOrderDoctor({ role, token, order: value, page }));
+    } else {
+      dispatch(getAppointmentsOrderDoctor({ role, token, order: value }));
+    }
+  };
+
+  const filterStatus = (status: string, page?: number) => {
+    if (status) {
+      if (page) {
+        dispatch(getAppointmentsByStatus({ role, token, status, page }));
+      } else {
+        dispatch(getAppointmentsByStatus({ role, token, status }));
+      }
+    } else {
+      dispatch(getAppointments({ token, role }));
+    }
+  };
+
+  const filterDoctor = (page?: number) => {
     if (searchByDoctor) {
       const id = searchByDoctor;
-      setSearchByDoctor("");
-      dispatch(getAppointmentsByDoctor({ role, token, id }));
+      if (page) {
+        dispatch(getAppointmentsByDoctor({ role, token, id, page }));
+      } else {
+        dispatch(getAppointmentsByDoctor({ role, token, id }));
+      }
     } else {
       dispatch(getAppointments({ token, role }));
     }
   };
 
-  const filterPatient = () => {
+  const filterPatient = (page?: number) => {
     if (searchByPatient) {
       const id = searchByPatient;
-      dispatch(getAppointmentsByPatient({ role, token, id }));
-      setSearchByPatient("");
+      if (page) {
+        dispatch(getAppointmentsByPatient({ role, token, id, page }));
+      } else {
+        dispatch(getAppointmentsByPatient({ role, token, id }));
+      }
     } else {
       dispatch(getAppointments({ token, role }));
     }
@@ -117,13 +249,16 @@ function AdminAppointments() {
   return (
     <>
       <div className={styles["filters"]}>
-        <div>
+        <div className={styles["filter-input"]}>
           <label htmlFor="select-patient">Order by Patient</label>
           <select
             defaultValue={"DEFAULT"}
             name="patient"
             id="select-patient"
-            onChange={orderByPatient}
+            onChange={(event: any) => {
+              const value = event?.target.value;
+              orderByPatient(value);
+            }}
           >
             <option value="DEFAULT" disabled>
               Select order
@@ -132,13 +267,16 @@ function AdminAppointments() {
             <option value="DESC">DESC</option>
           </select>
         </div>
-        <div>
+        <div className={styles["filter-input"]}>
           <label htmlFor="select-doctor">Order by Doctor</label>
           <select
             defaultValue={"DEFAULT"}
             name="doctor"
             id="select-doctor"
-            onChange={orderByDoctor}
+            onChange={(event: any) => {
+              const value = event?.target.value;
+              orderByDoctor(value);
+            }}
           >
             <option value="DEFAULT" disabled>
               Select order
@@ -149,13 +287,19 @@ function AdminAppointments() {
         </div>
       </div>
       <div className={styles["filter-values"]}>
-        <div>
+        <div className={styles["filter-input"]}>
           <label htmlFor="select-status">Status</label>
           <select
             defaultValue={"DEFAULT"}
             name="status"
             id="select-status"
-            onChange={filterStatus}
+            onChange={(event: any) => {
+              let option = event.target.value;
+              if (option === "none") {
+                option = "";
+              }
+              filterStatus(option);
+            }}
           >
             <option value="DEFAULT" disabled>
               Select status
@@ -165,7 +309,7 @@ function AdminAppointments() {
             <option value="false">Cancelled</option>
           </select>
         </div>
-        <div className={styles["search"]}>
+        <div className={`${styles["search"]} ${styles["filter-input"]}`}>
           <label htmlFor="search-doctor">Search by Doctor ID</label>
           <input
             type="number"
@@ -176,9 +320,9 @@ function AdminAppointments() {
             }}
             value={searchByDoctor}
           />
-          <button onClick={filterDoctor}>Search</button>
+          <button onClick={() => filterDoctor()}>Search</button>
         </div>
-        <div className={styles["search"]}>
+        <div className={`${styles["search"]} ${styles["filter-input"]}`}>
           <label htmlFor="search-patient">Search by Patient ID</label>
           <input
             type="number"
@@ -189,11 +333,14 @@ function AdminAppointments() {
             }}
             value={searchByPatient}
           />
-          <button onClick={filterPatient}>Search</button>
+          <button onClick={() => filterPatient()}>Search</button>
         </div>
       </div>
       {appointmentsList.length ? (
-        appointmentsList
+        <div>
+          {appointmentsList}
+          <div className={styles["pagination"]}>{pageSelectors(count)}</div>
+        </div>
       ) : (
         <div className={styles["appointments-placeholder"]}>
           <h2>No results were found!</h2>

@@ -9,6 +9,9 @@ import NewAppointment from "./features/create-appointment/NewAppointment";
 import Users from "./features/users/Users";
 import NewDoctor from "./features/new-doctor/NewDoctor";
 import DeleteAccount from "./features/delete-account/DeleteAccount";
+import EditAppointment from "./features/edit-appointment/EditAppointment";
+import CreateMessage from "./features/contact/CreateMessage";
+import Messages from "./features/messages/Messages";
 
 export default function App() {
   return (
@@ -16,6 +19,10 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home title="Arkham Hospital - Home" />} />
+          <Route
+            path="/home"
+            element={<Home title="Arkham Hospital - Home" />}
+          />
           <Route
             path="sign-up"
             element={<SignUp title="Arkham Hospital - Sign up" />}
@@ -26,9 +33,7 @@ export default function App() {
           />
           <Route
             path="appointments"
-            element={
-              <Appointments title={"Arkham Hospital - Delete account"} />
-            }
+            element={<Appointments title={"Arkham Hospital - Appointments"} />}
           />
           <Route
             path="appointments/new"
@@ -38,22 +43,39 @@ export default function App() {
           />
           <Route
             path="users"
-            element={<Users title={"Arkham Hospital - Delete account"} />}
+            element={<Users title={"Arkham Hospital - Users"} />}
           />
           <Route
             path="users/new-doctor"
             element={<NewDoctor title={"Arkham Hospital - New Doctor"} />}
           />
           <Route
-            path="delete"
+            path="delete-account"
             element={
               <DeleteAccount title={"Arkham Hospital - Delete account"} />
             }
           />
           <Route
+            path="edit-appointment/:id"
+            element={
+              <EditAppointment
+                title={"Arkham Hospital - Edit Appointment Date"}
+              />
+            }
+          />
+          <Route
+            path="/message"
+            element={<CreateMessage title="Arkham Hospital - Contact" />}
+          />
+          <Route
+            path="/messages"
+            element={<Messages title="Arkham Hospital - User Messages" />}
+          />
+          <Route
             path="*"
             element={<NotFound title="Arkham Hospital - Page not found" />}
           />
+          
         </Route>
       </Routes>
     </BrowserRouter>

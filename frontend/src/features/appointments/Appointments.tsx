@@ -15,6 +15,7 @@ export default function Appointments({ title }: Props) {
   const isLoggedIn = useAppSelector(selectLoginStatus);
   const userInfo = useAppSelector(selectLogin);
   const role = userInfo.role;
+  
   useEffect(() => {
     document.title = title;
   }, [title]);

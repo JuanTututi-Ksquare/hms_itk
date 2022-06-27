@@ -67,6 +67,7 @@ function NewAppointmentForm({ onSuccess }: Props) {
     });
   };
 
+  // Add Area field for each user to an array to avoid duplicates
   let checkArray: any[] = [];
   const areasList = availableDoctors.map((doctor: any) => {
     const areaName = doctor.areaName;
@@ -105,8 +106,9 @@ function NewAppointmentForm({ onSuccess }: Props) {
           id={id}
           value={id}
           onClick={changeSelection}
+          key={id}
         />
-        <label htmlFor={id}>{name}</label>
+        <label key={id} htmlFor={id}>{name}</label>
       </div>
     );
   });

@@ -29,7 +29,6 @@
     border-radius: 60px;
     padding: 15px;
     color: black;
-    font-style: "oxygen" sans-serif;
     margin: 10px 10px;
 }
 
@@ -46,10 +45,10 @@
 
 .menu-button > button:hover{
     color: white;
-    background-color: #36d8ab;
+    background-color: #24e0ab;
 }
 
 .menu-button > a > button:hover{
     color: white;
-    background-color: #36d8ab;
+    background-color: #24e0ab;
 }
