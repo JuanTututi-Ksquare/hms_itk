@@ -1,10 +1,9 @@
 import { Request, Response, Router } from "express";
 import { body, param, validationResult } from "express-validator";
-import { badRequest } from "../config/CustomRespones";
+import { badRequest, internalServerError } from "../config/CustomRespones";
 import { DoctorFilters, Pagination } from "../config/CustomTypes";
 import { getDoctorAppointments } from "../handlers/GetAppointments.handler";
 import { UpdateAppointmentDate } from "../handlers/UpdateAppointment.handler";
-import { checkDoctorAssociation } from "../middlewares/Association.validator";
 import { checkAuth } from "../middlewares/Auth.validator";
 import {
   checkExistingAppointment,
@@ -25,7 +24,7 @@ DoctorsRouter.get(
   async (req: Request, res: Response) => {
     const { id_doctor } = res.locals;
     let filters: DoctorFilters = {};
-    let pagination: Pagination = { page: 1, limit: 10 };
+    let pagination: Pagination = { page: 1, limit: 5 };
 
     // Get appointments for specific date - can be ordered
     if (req.query.date && typeof req.query.date === "string") {
@@ -46,24 +45,24 @@ DoctorsRouter.get(
     }
 
     // Get appointments for specific index and ordered
-    if(req.query.order && typeof req.query.order === "string") {
+    if (req.query.order && typeof req.query.order === "string") {
       const splittedOrder = req.query.order.split("+");
       const index = splittedOrder[0];
       const order = splittedOrder[1];
       if (index === "patient" && order === "ASC") {
         filters["orderByPatient"] = order;
       } else if (index === "patient" && order === "DESC") {
-        filters["orderByPatient"] = order
-      } else if (index ==="patient") {
+        filters["orderByPatient"] = order;
+      } else if (index === "patient") {
         filters["orderByPatient"] = "ASC";
       }
 
       if (index === "date" && order === "ASC") {
-        filters["orderByDate"] = order
-      } else if(index === "date" && order === "DESC") {
-        filters["orderByDate"] = order
+        filters["orderByDate"] = order;
+      } else if (index === "date" && order === "DESC") {
+        filters["orderByDate"] = order;
       } else if (index === "date") {
-        filters["orderByDate"] = "ASC"
+        filters["orderByDate"] = "ASC";
       }
     }
 
@@ -72,7 +71,7 @@ DoctorsRouter.get(
       if (!Number.isNaN(id_patient)) {
         filters = { ...filters, id_patient: id_patient };
       } else {
-        res.status(400).send({ error: "Invalid request!" });
+        return res.status(400).send({ error: "Invalid request!" });
       }
     }
 
@@ -81,7 +80,7 @@ DoctorsRouter.get(
       if (!Number.isNaN(page)) {
         pagination["page"] = page;
       } else {
-        res.status(400).send({ error: "Invalid request!" });
+        return res.status(400).send({ error: "Invalid request!" });
       }
     }
 
@@ -90,7 +89,7 @@ DoctorsRouter.get(
       if (!Number.isNaN(limit)) {
         pagination["limit"] = limit;
       } else {
-        res.status(400).send({ error: "Invalid request!" });
+        return res.status(400).send({ error: "Invalid request!" });
       }
     }
 
@@ -101,7 +100,7 @@ DoctorsRouter.get(
           pagination,
           filters
         );
-        res.status(200).send(appointments);
+        return res.status(200).send(appointments);
       } else {
         if (
           !Object.keys(req.query).length ||
@@ -112,13 +111,13 @@ DoctorsRouter.get(
             id_doctor,
             pagination
           );
-          res.status(200).send(appointments);
+          return res.status(200).send(appointments);
         } else {
-          res.status(400).send({ error: "Invalid request!" });
+          return res.status(400).send({ error: "Invalid request!" });
         }
       }
     } catch (error) {
-      res
+      return res
         .status(500)
         .send({ error: "Internal server error, please try again later!" });
     }
@@ -127,31 +126,37 @@ DoctorsRouter.get(
 
 DoctorsRouter.patch(
   "/appointments/:id",
-  body("date").exists().withMessage("Date is missing").isDate().withMessage("Date is not a valid date").isAfter().withMessage("Date must be in the future"),
-  param("id").exists().withMessage("ID is missing").isNumeric().withMessage("ID must be a number"),
+  body("date")
+    .exists()
+    .withMessage("Date is missing")
+    .toDate()
+    .withMessage("Date is not a valid date")
+    .isAfter()
+    .withMessage("Date must be in the future"),
+  param("id")
+    .exists()
+    .withMessage("ID is missing")
+    .isNumeric()
+    .withMessage("ID must be a number"),
   checkAuth,
   // Check if user is not deleted
   IsDeleted,
   roleValidator(["doctor"]),
   checkExistingDoctor,
-  checkExistingAppointment,
-  checkDoctorAssociation,
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res
-        .status(400)
-        .json({ ...badRequest, errors: errors.array() });
+      return res.status(400).json({ ...badRequest, errors: errors.array() });
     }
     const { date } = req.body;
     const { id } = req.params;
     try {
       const appointment = await UpdateAppointmentDate(date, +id);
-      res.status(200).send(appointment);
+      return res.status(200).send(appointment);
     } catch (error) {
-      res
+      return res
         .status(500)
-        .send({ error: "Internal server error, please try again later!" });
+        .send(internalServerError);
     }
   }
 );

@@ -9,9 +9,26 @@ export const GetAllUsers = async (
 ) => {
   const page = pagination["page"];
   const limit = pagination["limit"];
+  console.log(limit);
   const offset = (page - 1) * limit;
   try {
+    let count = 0;
     if ("is_deleted" in filters) {
+      const totalUsers = await Users.findAll({
+        where: {
+          ...filters,
+        },
+        include: [
+          {
+            model: Patients,
+          },
+          {
+            model: Doctors,
+          },
+        ],
+      });
+      count = totalUsers.length;
+
       const users = await Users.findAll({
         where: {
           ...filters,
@@ -27,8 +44,20 @@ export const GetAllUsers = async (
         limit,
         offset,
       });
-      return users;
+      return {users, count};
     } else {
+      const totalUsers = await Users.findAll({
+        include: [
+          {
+            model: Patients,
+          },
+          {
+            model: Doctors,
+          },
+        ],
+      });
+      count = totalUsers.length;
+
       const users = await Users.findAll({
         include: [
           {
@@ -41,7 +70,7 @@ export const GetAllUsers = async (
         limit,
         offset,
       });
-      return users;
+      return {users, count};
     }
   } catch (error) {
     return error;

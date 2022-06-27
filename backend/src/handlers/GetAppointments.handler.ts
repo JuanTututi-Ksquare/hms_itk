@@ -17,14 +17,25 @@ export const getAllAppointments = async (
 
   if (filters && !filters["orderByPatient"] && !filters["orderByDoctor"]) {
     let result = [];
+    let count = 0;
     try {
+      // We count the number of appointments to send it on request
+      const totalAppointments = await Appointments.findAll({
+        where: {
+          ...filters,
+        },
+      });
+      if (totalAppointments.length) {
+        count = totalAppointments.length;
+      }
+
       const appointments = await Appointments.findAll({
         where: {
           ...filters,
         },
         offset,
         limit,
-        order: [["date", "DESC"]]
+        order: [["date", "DESC"]],
       });
       if (appointments) {
         for (const appointment of appointments) {
@@ -49,18 +60,26 @@ export const getAllAppointments = async (
                 id: patient.id_user,
               },
             });
-            if(doctorUser && patientUser){
-              const {id, date, id_patient, id_doctor, status} = appointment;
+            if (doctorUser && patientUser) {
+              const { id, date, id_patient, id_doctor, status } = appointment;
               const patientName = `${patientUser.first_name} ${patientUser.last_name}`;
-              const doctorName = `${doctorUser.first_name} ${doctorUser.last_name}`
-              result.push({id, date, id_patient, id_doctor, patientName, doctorName, status});
+              const doctorName = `${doctorUser.first_name} ${doctorUser.last_name}`;
+              result.push({
+                id,
+                date,
+                id_patient,
+                id_doctor,
+                patientName,
+                doctorName,
+                status,
+              });
             }
           } else {
             throw new Error("Internal Server Error");
           }
         }
       }
-      return result;
+      return { appointments: result, count, filters };
     } catch (error) {
       return error;
     }
@@ -76,6 +95,12 @@ export const getAllAppointments = async (
       : (["id_doctor", filters["orderByDoctor"]] as OrderItem);
     try {
       let result = [];
+      let count = 0;
+      const totalAppointments = await Appointments.findAll();
+      if (totalAppointments.length) {
+        count = totalAppointments.length;
+      }
+
       const appointments = await Appointments.findAll({
         offset,
         limit,
@@ -104,18 +129,26 @@ export const getAllAppointments = async (
                 id: patient.id_user,
               },
             });
-            if(doctorUser && patientUser){
-              const {id, date, id_patient, id_doctor, status} = appointment;
+            if (doctorUser && patientUser) {
+              const { id, date, id_patient, id_doctor, status } = appointment;
               const patientName = `${patientUser.first_name} ${patientUser.last_name}`;
-              const doctorName = `${doctorUser.first_name} ${doctorUser.last_name}`
-              result.push({id, date, id_patient, id_doctor, patientName, doctorName, status});
+              const doctorName = `${doctorUser.first_name} ${doctorUser.last_name}`;
+              result.push({
+                id,
+                date,
+                id_patient,
+                id_doctor,
+                patientName,
+                doctorName,
+                status,
+              });
             }
           } else {
             throw new Error("Internal Server Error");
           }
         }
       }
-      return result;
+      return { appointments: result, count, filters };
     } catch (error) {
       return error;
     }
@@ -123,10 +156,15 @@ export const getAllAppointments = async (
 
   try {
     let result = [];
+    let count = 0;
+    const totalAppointments = await Appointments.findAll();
+    if (totalAppointments.length) {
+      count = totalAppointments.length;
+    }
     const appointments = await Appointments.findAll({
       offset,
       limit,
-      order: [["date", "DESC"]]
+      order: [["date", "DESC"]],
     });
     if (appointments) {
       for (const appointment of appointments) {
@@ -151,18 +189,26 @@ export const getAllAppointments = async (
               id: patient.id_user,
             },
           });
-          if(doctorUser && patientUser){
-            const {id, date, id_patient, id_doctor, status} = appointment;
+          if (doctorUser && patientUser) {
+            const { id, date, id_patient, id_doctor, status } = appointment;
             const patientName = `${patientUser.first_name} ${patientUser.last_name}`;
-            const doctorName = `${doctorUser.first_name} ${doctorUser.last_name}`
-            result.push({id, date, id_patient, id_doctor, patientName, doctorName, status});
+            const doctorName = `${doctorUser.first_name} ${doctorUser.last_name}`;
+            result.push({
+              id,
+              date,
+              id_patient,
+              id_doctor,
+              patientName,
+              doctorName,
+              status,
+            });
           }
         } else {
           throw new Error("Internal Server Error");
         }
       }
     }
-    return result;
+    return { appointments: result, count };
   } catch (error) {
     return error;
   }
@@ -177,6 +223,7 @@ export const getPatientAppointments = async (
   const limit = pagination["limit"];
   const offset = (page - 1) * limit;
   let result = [];
+  let count = 0;
   try {
     const patient = await Patients.findOne({
       where: {
@@ -186,13 +233,24 @@ export const getPatientAppointments = async (
     if (!patient) {
       throw new Error(`User with id: ${uid} doesn't exists!`);
     }
+
+    const totalAppointments = await Appointments.findAll({
+      where: {
+        id_patient: patient.id,
+        status: true,
+      },
+    });
+
+    count = totalAppointments.length;
+
     const list = await Appointments.findAll({
       where: {
         id_patient: patient.id,
+        status: true,
       },
       offset,
       limit,
-      order: [["date", "DESC"]]
+      order: [["date", "DESC"]],
     });
     if (list) {
       for (const appointment of list) {
@@ -217,18 +275,26 @@ export const getPatientAppointments = async (
               id: patient.id_user,
             },
           });
-          if(doctorUser && patientUser){
-            const {id, date, id_patient, id_doctor, status} = appointment;
+          if (doctorUser && patientUser) {
+            const { id, date, id_patient, id_doctor, status } = appointment;
             const patientName = `${patientUser.first_name} ${patientUser.last_name}`;
-            const doctorName = `${doctorUser.first_name} ${doctorUser.last_name}`
-            result.push({id, date, id_patient, id_doctor, patientName, doctorName, status});
+            const doctorName = `${doctorUser.first_name} ${doctorUser.last_name}`;
+            result.push({
+              id,
+              date,
+              id_patient,
+              id_doctor,
+              patientName,
+              doctorName,
+              status,
+            });
           }
         } else {
           throw new Error("Internal Server Error");
         }
       }
     }
-    return result;
+    return { appointments: result, count };
   } catch (error) {
     return error;
   }
@@ -277,11 +343,24 @@ export const getDoctorAppointments = async (
 
     try {
       let result = [];
+      let count = 0;
+
+      const totalAppointments = await Appointments.findAll({
+        where: {
+          ...otherFilters,
+          id_doctor,
+          date: { [Op.between]: [initialDate, endDate] },
+          status: true,
+        },
+      });
+      count = totalAppointments.length;
+
       const appointments = await Appointments.findAll({
         where: {
           ...otherFilters,
           id_doctor,
           date: { [Op.between]: [initialDate, endDate] },
+          status: true,
         },
         offset,
         limit,
@@ -310,18 +389,26 @@ export const getDoctorAppointments = async (
                 id: patient.id_user,
               },
             });
-            if(doctorUser && patientUser){
-              const {id, date, id_patient, id_doctor, status} = appointment;
+            if (doctorUser && patientUser) {
+              const { id, date, id_patient, id_doctor, status } = appointment;
               const patientName = `${patientUser.first_name} ${patientUser.last_name}`;
-              const doctorName = `${doctorUser.first_name} ${doctorUser.last_name}`
-              result.push({id, date, id_patient, id_doctor, patientName, doctorName, status});
+              const doctorName = `${doctorUser.first_name} ${doctorUser.last_name}`;
+              result.push({
+                id,
+                date,
+                id_patient,
+                id_doctor,
+                patientName,
+                doctorName,
+                status,
+              });
             }
           } else {
             throw new Error("Internal Server Error");
           }
         }
       }
-      return result;
+      return { appointments: result, count, filters };
     } catch (error) {
       return error;
     }
@@ -336,6 +423,18 @@ export const getDoctorAppointments = async (
   ) {
     try {
       let result = [];
+      let count = 0;
+
+      const totalAppointments = await Appointments.findAll({
+        where: {
+          ...filters,
+          id_doctor,
+          status: true,
+        },
+      });
+
+      count = totalAppointments.length;
+
       const appointments = await Appointments.findAll({
         where: {
           ...filters,
@@ -368,18 +467,26 @@ export const getDoctorAppointments = async (
                 id: patient.id_user,
               },
             });
-            if(doctorUser && patientUser){
-              const {id, date, id_patient, id_doctor, status} = appointment;
+            if (doctorUser && patientUser) {
+              const { id, date, id_patient, id_doctor, status } = appointment;
               const patientName = `${patientUser.first_name} ${patientUser.last_name}`;
-              const doctorName = `${doctorUser.first_name} ${doctorUser.last_name}`
-              result.push({id, date, id_patient, id_doctor, patientName, doctorName, status});
+              const doctorName = `${doctorUser.first_name} ${doctorUser.last_name}`;
+              result.push({
+                id,
+                date,
+                id_patient,
+                id_doctor,
+                patientName,
+                doctorName,
+                status,
+              });
             }
           } else {
             throw new Error("Internal Server Error");
           }
         }
       }
-      return result;
+      return {appointments: result, count, filters};
     } catch (error) {
       return error;
     }
@@ -395,6 +502,14 @@ export const getDoctorAppointments = async (
       : (["date", filters["orderByDate"]] as OrderItem);
     try {
       let result = [];
+      let count = 0;
+      const totalAppointments = await Appointments.findAll({
+        where: {
+          id_doctor,
+          status: true,
+        }
+      })
+      count = totalAppointments.length;
       const appointments = await Appointments.findAll({
         where: {
           id_doctor,
@@ -427,18 +542,26 @@ export const getDoctorAppointments = async (
                 id: patient.id_user,
               },
             });
-            if(doctorUser && patientUser){
-              const {id, date, id_patient, id_doctor, status} = appointment;
+            if (doctorUser && patientUser) {
+              const { id, date, id_patient, id_doctor, status } = appointment;
               const patientName = `${patientUser.first_name} ${patientUser.last_name}`;
-              const doctorName = `${doctorUser.first_name} ${doctorUser.last_name}`
-              result.push({id, date, id_patient, id_doctor, patientName, doctorName, status});
+              const doctorName = `${doctorUser.first_name} ${doctorUser.last_name}`;
+              result.push({
+                id,
+                date,
+                id_patient,
+                id_doctor,
+                patientName,
+                doctorName,
+                status,
+              });
             }
           } else {
             throw new Error("Internal Server Error");
           }
         }
       }
-      return result;
+      return {appointments: result, count, filters};
     } catch (error) {
       return error;
     }
@@ -446,6 +569,16 @@ export const getDoctorAppointments = async (
 
   try {
     let result = [];
+    let count = 0;
+
+    const totalAppointments = await Appointments.findAll({
+      where: {
+        id_doctor,
+        status: true,
+      },
+    });
+    count = totalAppointments.length;
+
     const appointments = await Appointments.findAll({
       where: {
         id_doctor,
@@ -453,7 +586,7 @@ export const getDoctorAppointments = async (
       },
       offset,
       limit,
-      order: [["date", "DESC"]]
+      order: [["date", "DESC"]],
     });
     if (appointments) {
       for (const appointment of appointments) {
@@ -478,18 +611,26 @@ export const getDoctorAppointments = async (
               id: patient.id_user,
             },
           });
-          if(doctorUser && patientUser){
-            const {id, date, id_patient, id_doctor, status} = appointment;
+          if (doctorUser && patientUser) {
+            const { id, date, id_patient, id_doctor, status } = appointment;
             const patientName = `${patientUser.first_name} ${patientUser.last_name}`;
-            const doctorName = `${doctorUser.first_name} ${doctorUser.last_name}`
-            result.push({id, date, id_patient, id_doctor, patientName, doctorName, status});
+            const doctorName = `${doctorUser.first_name} ${doctorUser.last_name}`;
+            result.push({
+              id,
+              date,
+              id_patient,
+              id_doctor,
+              patientName,
+              doctorName,
+              status,
+            });
           }
         } else {
           throw new Error("Internal Server Error");
         }
       }
     }
-    return result;
+    return { appointments: result, count };
   } catch (error) {
     return error;
   }

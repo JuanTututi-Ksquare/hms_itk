@@ -2,7 +2,7 @@ import { Appointments } from "../models/Appointments.model";
 
 export const UpdateAppointmentDate = async (date: Date, id: number) => {
   try {
-    await Appointments.update(
+    const updatedAppointment = await Appointments.update(
       {
         date: date,
       },
@@ -12,7 +12,11 @@ export const UpdateAppointmentDate = async (date: Date, id: number) => {
         },
       }
     );
-    return { success: "Appointment updated sucessfully!" };
+    if (updatedAppointment) {
+      return { success: "Appointment updated sucessfully!", date};
+    } else {
+      throw new Error("Appointment with given id doesn't exists");
+    }
   } catch (error) {
     return error;
   }

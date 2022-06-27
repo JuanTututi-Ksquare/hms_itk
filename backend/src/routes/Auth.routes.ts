@@ -28,13 +28,3 @@ AuthRouter.delete(
     }
   }
 );
-
-
-AuthRouter.get(
-  "/login",
-  checkAuth,
-  checkExistingUser,
-  (req: Request, res: Response) => {
-    return res.status(200).send({success: "User login succesfull!"});
-  }
-)

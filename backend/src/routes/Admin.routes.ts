@@ -173,14 +173,19 @@ AdminRouter.get(
   roleValidator(["admin"]),
   async (req: Request, res: Response) => {
     let filters: AdminFilters = {};
-    let pagination: { page: number; limit: number } = { page: 1, limit: 10 };
+    let pagination: { page: number; limit: number } = { page: 1, limit: 5 };
     // Filter by patient
     if (req.query.patient && typeof req.query.patient === "string") {
       const id_patient = req.query.patient;
       if (!Number.isNaN(parseInt(id_patient, 10))) {
         filters = { ...filters, id_patient: +id_patient };
       } else {
-        res.status(400).send({ ...badRequest, error: "Invalid url query - patient search!" });
+        return res
+          .status(400)
+          .send({
+            ...badRequest,
+            error: "Invalid url query - patient search!",
+          });
       }
     }
 
@@ -190,7 +195,9 @@ AdminRouter.get(
       if (!Number.isNaN(parseInt(id_doctor, 10))) {
         filters = { ...filters, id_doctor: +id_doctor };
       } else {
-        res.status(400).send({ ...badRequest, error: "Invalid url query - doctor search!" });
+        return res
+          .status(400)
+          .send({ ...badRequest, error: "Invalid url query - doctor search!" });
       }
     }
 
@@ -204,7 +211,9 @@ AdminRouter.get(
         status = false;
         filters = { ...filters, status };
       } else {
-        res.status(400).send({ ...badRequest, error: "Invalid url query - status order!" });
+        return res
+          .status(400)
+          .send({ ...badRequest, error: "Invalid url query - status order!" });
       }
     }
 
@@ -236,7 +245,7 @@ AdminRouter.get(
       if (!Number.isNaN(parseInt(page, 10))) {
         pagination["page"] = +page;
       } else {
-        res.status(400).send({ ...badRequest, error: "Invalid url query!" });
+        return res.status(400).send({ ...badRequest, error: "Invalid url query!" });
       }
     }
 
@@ -245,13 +254,13 @@ AdminRouter.get(
       if (!Number.isNaN(parseInt(limit, 10))) {
         pagination["limit"] = +limit;
       } else {
-        res.status(400).send({ ...badRequest, error: "Invalid url query!" });
+        return res.status(400).send({ ...badRequest, error: "Invalid url query!" });
       }
     }
     try {
       if (Object.keys(filters).length) {
         const appointments = await getAllAppointments(pagination, filters);
-        res.status(200).send(appointments);
+        return res.status(200).send(appointments);
       } else {
         if (
           !Object.keys(req.query).length ||
@@ -260,13 +269,15 @@ AdminRouter.get(
         ) {
           console.log("sin filters 1");
           const appointments = await getAllAppointments(pagination);
-          res.status(200).send(appointments);
+          return res.status(200).send(appointments);
         } else {
-          res.status(400).send({ ...badRequest, error: "Invalid url query - no queries!" });
+          return res
+            .status(400)
+            .send({ ...badRequest, error: "Invalid url query - no queries!" });
         }
       }
     } catch (error) {
-      res.status(500).send(internalServerError);
+      return res.status(500).send(internalServerError);
     }
   }
 );
@@ -279,7 +290,8 @@ AdminRouter.get(
   roleValidator(["admin"]),
   async (req: Request, res: Response) => {
     let filters: UserFilters = {};
-    let pagination: { page: number; limit: number } = { page: 1, limit: 20 };
+    let pagination: { page: number; limit: number } = { page: 1, limit: 5 };
+
     if (req.query.is_deleted && typeof req.query.is_deleted === "string") {
       let is_deleted = false;
       if (req.query.status === "true") {
@@ -289,12 +301,24 @@ AdminRouter.get(
         is_deleted = false;
         filters = { ...filters, is_deleted };
       } else {
-        return res.status(400).send({ ...badRequest, error: "Invalid url query!" });
+        return res
+          .status(400)
+          .send({ ...badRequest, error: "Invalid url query!" });
       }
     }
+
+    if (req.query.page && typeof req.query.page === "string") {
+      const page = +req.query.page;
+      if (!Number.isNaN(page)) {
+        pagination["page"] = page;
+      } else {
+        return res.status(400).send({ error: "Invalid request!" });
+      }
+    }
+
     try {
       const users = await GetAllUsers(filters, pagination);
-      return res.status(200).json(users);  
+      return res.status(200).json(users);
     } catch (error) {
       return res.status(500).send(internalServerError);
     }

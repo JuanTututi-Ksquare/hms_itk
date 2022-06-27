@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 import { body, validationResult } from "express-validator";
 import { badRequest, internalServerError } from "../config/CustomRespones";
+import { Pagination } from "../config/CustomTypes";
 import { CreateContactMessage } from "../handlers/CreateContactMessage.handler";
 import { GetContactMessages } from "../handlers/GetContactMessages.handler";
 import { checkAuth } from "../middlewares/Auth.validator";
@@ -47,8 +48,20 @@ ContactRouter.get(
   IsDeleted,
   roleValidator(["admin"]),
   async (req: Request, res: Response) => {
+    
+    let pagination: Pagination = { page: 1, limit: 5 };
+
+    if (req.query.page && typeof req.query.page === "string") {
+      const page = +req.query.page;
+      if (!Number.isNaN(page)) {
+        pagination["page"] = page;
+      } else {
+        return res.status(400).send({ error: "Invalid request!" });
+      }
+    }
+
     try {
-      const messages = await GetContactMessages();
+      const messages = await GetContactMessages(pagination);
       return res.status(200).send(messages);
     } catch (error) {
       return res.status(500).send(internalServerError);

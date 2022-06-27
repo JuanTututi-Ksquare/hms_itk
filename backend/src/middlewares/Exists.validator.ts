@@ -79,6 +79,7 @@ export const checkExistingDoctor = async (
         });
         if (doctor) {
           res.locals = { ...res.locals, id_doctor: doctor.id };
+          console.log("El Doctor existe")
           return next();
         } else {
           return res.status(500).json(internalServerError);
